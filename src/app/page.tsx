@@ -1,8 +1,60 @@
+"use client"
 import Image from "next/image";
+import React, { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { auth } from '@/firebase';
+import { onAuthStateChanged } from "firebase/auth";
+import { User, getBills } from '@/utils';
+
+interface Bill {
+  id: string;
+  bimonthly: boolean;
+  fixed: boolean;
+  name: string;
+}
 
 export default function Home() {
+  const router = useRouter();
+  const [user, setUser] = useState<User>();
+  const isUserLoggedIn = useCallback(() => {
+		onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                setUser({ email: user.email, uid: user.uid });
+                const promises = [getBills(setBills)];
+                await Promise.all(promises);
+			} else {
+				return router.push("/login");
+			}
+		});
+	}, [router]);
+  const [bills, setBills] = useState([]);
+
+  useEffect(() => {
+    isUserLoggedIn();
+}, [isUserLoggedIn]);
+
+  if(!user?.email) return <div className='text-2xl font-bold'>Ładowanie, proszę czekać...</div>
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
+
+
+      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
+        {bills?.map((bill: Bill) =>(
+          <div className='w-full bg-slate-400 p-3 flex items-center justify-between rounded my-3' key={bill.id}>
+          <p className='md:text-md text-sm'>{bill.name}</p>
+          <p className='md:text-md text-sm'>{bill.bimonthly? 'Co 2 miesiace' : 'Comiesiac' }</p>
+          <p className='md:text-md text-sm'>{bill.fixed? 'Stale': 'Zmienne'}</p>
+          <div className="flex items-center space-x-5">
+                
+                        
+          </div>
+          
+          </div>
+          ))}            
+      </div>
+
+
+
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
           Get started by editing&nbsp;

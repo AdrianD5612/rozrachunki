@@ -15,19 +15,22 @@ interface Bill {
 
 export default function Home() {
   const router = useRouter();
+  const [bills, setBills] = useState([]);
+  const [billsAmounts, setBillsAmounts] = useState([]);
+  //hardcoded date
+  const date='2024.01';
   const [user, setUser] = useState<User>();
   const isUserLoggedIn = useCallback(() => {
 		onAuthStateChanged(auth, async (user) => {
             if (user) {
                 setUser({ email: user.email, uid: user.uid });
-                const promises = [getBills(setBills)];
+                const promises = [getBills(date,setBills,setBillsAmounts)];
                 await Promise.all(promises);
 			} else {
 				return router.push("/login");
 			}
 		});
 	}, [router]);
-  const [bills, setBills] = useState([]);
 
   useEffect(() => {
     isUserLoggedIn();

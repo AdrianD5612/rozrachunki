@@ -1,7 +1,7 @@
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "./firebase";
 import { toast } from "react-toastify";
-import { doc, deleteDoc, onSnapshot, collection, addDoc, query, where, serverTimestamp, orderBy, Timestamp, setDoc } from "firebase/firestore";
+import { doc, deleteDoc, onSnapshot, collection, addDoc, query, where, serverTimestamp, orderBy, Timestamp, setDoc, getDocs, getDoc  } from "firebase/firestore";
 import db from "./firebase";
 
 export interface User {
@@ -9,16 +9,26 @@ export interface User {
     uid: string | null
 }
 
-export const getBills = async (setBills: any) => {
+export const getBills = async (date:  string, setBills: any, setBillsAmounts: any) => {
 	try {
-        const unsub = onSnapshot(collection(db, "bills"), doc => {
-            const docs: any = []
-            doc.forEach((d: any) => {
-              docs.push( { ...d.data(), id: d.id })
-            });
-			setBills(docs)
-			console.log(docs)
-        }) 
+		const bills: any = []
+		const billsAmounts: any = []
+		const q = query(collection(db, "bills"));
+		const querySnapshot = await getDocs(q);
+		querySnapshot.forEach((async downloaded => {
+            bills.push( { ...downloaded.data(), id: downloaded.id });
+			const docRef = doc(db, 'bills' , downloaded.id, 'amounts', date);
+			const docSnap = await getDoc(docRef);
+			if (docSnap.exists()) {
+			billsAmounts.push(docSnap.data());
+			} else {
+			console.error("No such document!");
+			}
+            }));
+		setBills(bills)
+		setBillsAmounts(billsAmounts)
+		console.log(bills)
+		console.log(billsAmounts)
 	} catch (err) {
 		console.error(err)
 		setBills([])

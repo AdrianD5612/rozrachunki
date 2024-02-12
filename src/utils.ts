@@ -9,26 +9,25 @@ export interface User {
     uid: string | null
 }
 
-export const getBills = async (date:  string, setBills: any, setBillsAmounts: any) => {
+export const getBills = async (date:  string, setBills: any, setFinished: any) => {
 	try {
 		const bills: any = []
-		const billsAmounts: any = []
 		const q = query(collection(db, "bills"));
 		const querySnapshot = await getDocs(q);
+		let collectionSize=querySnapshot.size;	//amount of different bills
 		querySnapshot.forEach((async downloaded => {
-            bills.push( { ...downloaded.data(), id: downloaded.id });
 			const docRef = doc(db, 'bills' , downloaded.id, 'amounts', date);
 			const docSnap = await getDoc(docRef);
 			if (docSnap.exists()) {
-			billsAmounts.push(docSnap.data());
+				bills.push( { ...downloaded.data(), id: downloaded.id, ...docSnap.data() });
+				collectionSize--;
 			} else {
 			console.error("No such document!");
+			//TODO push json z wartosciami pustymi i handle to pozniej
 			}
+			if (collectionSize === 0 ) setFinished(true);	//it is finished after fetching all "amounts" docs for every collection entry, without this table will be rendered incomplete
             }));
 		setBills(bills)
-		setBillsAmounts(billsAmounts)
-		console.log(bills)
-		console.log(billsAmounts)
 	} catch (err) {
 		console.error(err)
 		setBills([])

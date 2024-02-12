@@ -31,3 +31,19 @@ body {
     text-wrap: balance;
   }
 }
+
+tr,
+td,
+th {
+	border: 1px solid #93c5fd;
+	border-radius: 2px;
+	padding: 3px;
+	text-align: left;
+	background-color: #1e293b;
+}
+
+table {
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+	margin-left: auto;
+	margin-right: auto;
+}

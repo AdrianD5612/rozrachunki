@@ -11,20 +11,23 @@ interface Bill {
   bimonthly: boolean;
   fixed: boolean;
   name: string;
+  amount: number;
+  day: number;
 }
 
 export default function Home() {
   const router = useRouter();
   const [bills, setBills] = useState([]);
-  const [billsAmounts, setBillsAmounts] = useState([]);
+  const [finished, setFinished] = useState(false);
   //hardcoded date
   const date='2024.01';
   const [user, setUser] = useState<User>();
   const isUserLoggedIn = useCallback(() => {
 		onAuthStateChanged(auth, async (user) => {
             if (user) {
+                setFinished(false)
                 setUser({ email: user.email, uid: user.uid });
-                const promises = [getBills(date,setBills,setBillsAmounts)];
+                const promises = [getBills(date, setBills, setFinished)];
                 await Promise.all(promises);
 			} else {
 				return router.push("/login");
@@ -33,27 +36,35 @@ export default function Home() {
 	}, [router]);
 
   useEffect(() => {
-    isUserLoggedIn();
+    isUserLoggedIn()
 }, [isUserLoggedIn]);
 
-  if(!user?.email) return <div className='text-2xl font-bold'>Ładowanie, proszę czekać...</div>
+if (!finished) return  <div className="flex justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">Ładowanie, proszę czekać...</div>
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
 
 
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        {bills?.map((bill: Bill) =>(
-          <div className='w-full bg-slate-400 p-3 flex items-center justify-between rounded my-3' key={bill.id}>
-          <p className='md:text-md text-sm'>{bill.name}</p>
-          <p className='md:text-md text-sm'>{bill.bimonthly? 'Co 2 miesiace' : 'Comiesiac' }</p>
-          <p className='md:text-md text-sm'>{bill.fixed? 'Stale': 'Zmienne'}</p>
-          <div className="flex items-center space-x-5">
-                
-                        
-          </div>
-          
-          </div>
-          ))}            
+        <table>
+          <thead>
+            <tr>
+              <th>Nazwa</th>
+              <th>Termin</th>
+              <th>Kwota</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bills?.map((bill: Bill) =>(
+            <tr key={bill.id}>
+            <td className='md:text-md text-sm'>{bill.name}</td>
+            <td className='md:text-md text-sm'>{bill.day}</td>
+            <td className='md:text-md text-sm'>{bill.amount}</td>
+            </tr>
+            ))}   
+          </tbody>
+        </table>
+
+
       </div>
 
 

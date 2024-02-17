@@ -53,9 +53,9 @@ export default function Home() {
 
 if (!finished) return  <div className="flex justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">Ładowanie, proszę czekać...</div>
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24 border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:p-4 lg:bg-zinc-800/30">
+    <main className="flex flex-col items-center justify-center p-24 border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:p-4 lg:bg-zinc-800/30">
 
-      <div className="z-10 max-w-5xl w-full from-black via-black items-center justify-between font-mono text-sm lg:flex">
+      <div className="z-10 w-0 from-black via-black items-center justify-center font-mono text-sm lg:flex">
         <>
           <TuiDateMonthPicker
             handleChange={dateChanged}
@@ -66,7 +66,7 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
         </>
       </div>
 
-      <div className="z-10 max-w-5xl w-full from-black via-black items-center justify-between font-mono text-sm lg:flex">
+      <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm lg:flex">
         <table className="text-white">
           <thead>
             <tr>

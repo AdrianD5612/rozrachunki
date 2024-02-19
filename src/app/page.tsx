@@ -19,10 +19,10 @@ interface Bill {
 export default function Home() {
   const router = useRouter();
   const [bills, setBills] = useState([]);
+  const [editMode, setEditMode] = useState(true); //set to false
   const [finished, setFinished] = useState(false);
   //hardcoded date
   const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
-  //const [selectedDate, setSelectedDate] = useState('2024-01');
   const dateChanged = (value: string) => {
     setSelectedDate(new Date(value));
     fetchNewDate(new Date(value));
@@ -67,6 +67,7 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
       </div>
 
       <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm lg:flex">
+      <button onClick={() => setEditMode(!editMode)}>Edytuj</button>
         <table className="text-white">
           <thead>
             <tr>
@@ -85,6 +86,64 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
             ))}   
           </tbody>
         </table>
+
+
+      </div>
+
+      <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm lg:flex">
+        <table className="text-white">
+          <thead>
+            <tr>
+              <th>Nazwa</th>
+              <th>Termin</th>
+              <th>Kwota</th>
+            </tr>
+          </thead>
+          <tbody>
+          {bills?.map((bill: Bill, i) =>(
+            <tr key={bill.id}>
+            <td className='md:text-md text-sm'>{bill.name}</td>
+            <td className='md:text-md text-sm'>
+              {editMode ? (
+                <input
+                  type="number"
+                  value={bill.day}
+                  onChange={(e) => {
+                    const newValue = parseInt(e.target.value);
+                    setBills((prevBills: any) =>
+                      prevBills.map((prevBill: Bill) =>
+                        prevBill.id === bill.id ? { ...prevBill, day: newValue } : prevBill
+                      )
+                    );
+                  }}
+                />
+              ) : (
+                bill.day
+              )}
+              </td>
+              <td className='md:text-md text-sm'>
+              {editMode? (
+                <input
+                  type="number"
+                  value={bill.amount}
+                  onChange={(e) => {
+                    const newValue = parseFloat(e.target.value);
+                    setBills((prevBills: any) =>
+                      prevBills.map((prevBill: Bill) =>
+                        prevBill.id === bill.id ? { ...prevBill, amount: newValue } : prevBill
+                      )
+                    );
+                  }}
+                />
+              ) : (
+                bill.amount
+              )}
+            </td>
+            </tr>
+            ))} 
+          </tbody>
+        </table>
+
 
 
       </div>

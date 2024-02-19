@@ -9,6 +9,19 @@ export interface User {
     uid: string | null
 }
 
+export interface Bill {
+	id: string;
+	bimonthly: boolean;
+	fixedAmount: boolean;
+	fixedAmountV: number;
+	fixedDay: boolean;
+	fixedDayV: number;
+	name: string;
+	amount: number;
+	day: number;
+	paid: boolean;
+  }
+  
 export const getBills = async (date:  string, setBills: any, setFinished: any) => {
 	try {
 		const bills: any = []
@@ -29,10 +42,23 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 			if (collectionSize === 0 ) setFinished(true);	//it is finished after fetching all "amounts" docs for every collection entry, without this table will be rendered incomplete
             }));
 		setBills(bills)
+		console.log(bills)
 	} catch (err) {
 		console.error(err)
 		setBills([])
 	}
+}
+
+export const saveBills = (date: string, newBills: Bill[]) => {
+	try {
+		newBills.forEach(async (element) => {
+		await setDoc(doc(db, "bills", element.id, 'amounts', date), {amount: element.amount, day: element.day, paid: element.paid});
+		})
+
+	} catch(err) {
+		console.error(err)
+	}
+
 }
 
 export const successMessage = (message:string) => {

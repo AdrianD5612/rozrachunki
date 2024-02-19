@@ -4,21 +4,13 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase';
 import { onAuthStateChanged } from "firebase/auth";
-import { User, getBills } from '@/utils';
+import { User, Bill, getBills, saveBills } from '@/utils';
 import { TuiDateMonthPicker } from 'nextjs-tui-date-picker';
 
-interface Bill {
-  id: string;
-  bimonthly: boolean;
-  fixed: boolean;
-  name: string;
-  amount: number;
-  day: number;
-}
 
 export default function Home() {
   const router = useRouter();
-  const [bills, setBills] = useState([]);
+  const [bills, setBills] = useState<Bill[] | []>([]);
   const [editMode, setEditMode] = useState(true); //set to false
   const [finished, setFinished] = useState(false);
   //hardcoded date
@@ -33,6 +25,40 @@ export default function Home() {
     console.log(shortDate);
     const promises = [getBills(shortDate, setBills, setFinished)];
     await Promise.all(promises);
+  }
+  const uploadBills = () => {
+    let validatedBills: Bill [];
+    validatedBills=[];
+    let valid=true;
+    //validate if all fields are filled
+    bills.forEach((element: Bill) => {
+      element.paid=false; //paid status not yet implemented
+      if (!element.amount) {
+        if (element.fixedAmount) {
+          element.amount=element.fixedAmountV;
+          validatedBills.push(element);
+        } else {
+          valid=false;
+        }
+      } else {
+        validatedBills.push(element);
+      }
+      if (!element.day) {
+        if (element.fixedDay) {
+          element.day=element.fixedDayV;
+          validatedBills.push(element);
+        } else {
+          valid=false;
+        }
+      } else {
+        validatedBills.push(element);
+      }
+    })
+    if (valid) {
+      setBills(validatedBills);
+      let shortDate=(selectedDate.getFullYear().toString()+'.'+(selectedDate.getMonth()+1).toString());
+      saveBills(shortDate, bills);
+    }
   }
   const [user, setUser] = useState<User>();
   const isUserLoggedIn = useCallback(() => {
@@ -64,10 +90,11 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
             fontSize={16}
           />
         </>
+        <input type="checkbox" id="editing" name="editing" checked={editMode} onChange={() => setEditMode(!editMode)}></input>
+        <label htmlFor="editing">Tryb edycji</label><br></br>
       </div>
 
       <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm lg:flex">
-      <button onClick={() => setEditMode(!editMode)}>Edytuj</button>
         <table className="text-white">
           <thead>
             <tr>
@@ -107,7 +134,8 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
               {editMode ? (
                 <input
                   type="number"
-                  value={bill.day}
+                  className='w-16'
+                  value={bill.day ? (bill.day) : (bill.fixedDay? (bill.fixedDayV): NaN )}
                   onChange={(e) => {
                     const newValue = parseInt(e.target.value);
                     setBills((prevBills: any) =>
@@ -125,7 +153,8 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
               {editMode? (
                 <input
                   type="number"
-                  value={bill.amount}
+                  className='w-16'
+                  value={bill.amount ? (bill.amount) : (bill.fixedAmount? (bill.fixedAmountV): NaN )}
                   onChange={(e) => {
                     const newValue = parseFloat(e.target.value);
                     setBills((prevBills: any) =>
@@ -143,15 +172,12 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
             ))} 
           </tbody>
         </table>
-
-
-
       </div>
-
-
-
-      
-      
+      <div style={{
+        display: editMode?"block":"none"
+      }}>
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => uploadBills()}>Zapisz zmiany</button>
+      </div>
     </main>
   );
 }

@@ -21,6 +21,16 @@ export interface Bill {
 	day: number;
 	paid: boolean;
   }
+
+  export interface BillLite {
+	id: string;
+	bimonthly: boolean;
+	fixedAmount: boolean;
+	fixedAmountV: number;
+	fixedDay: boolean;
+	fixedDayV: number;
+	name: string;
+  }
   
 export const getBills = async (date:  string, setBills: any, setFinished: any) => {
 	try {
@@ -59,6 +69,23 @@ export const saveBills = (date: string, newBills: Bill[]) => {
 		console.error(err)
 	}
 
+}
+
+export const getBillsToManage = async (setBills: any, setFinished: any) => {
+	try {
+        const unsub = onSnapshot(collection(db, "bills"), doc => {
+            const docs: any = []
+            doc.forEach((d: any) => {
+              docs.push( { ...d.data(), id: d.id })
+            });
+			setBills(docs);
+			setFinished(true);
+			console.log(docs);
+        }) 
+	} catch (err) {
+		console.error(err)
+		setBills([])
+	}
 }
 
 export const successMessage = (message:string) => {

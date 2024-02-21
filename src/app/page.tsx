@@ -13,14 +13,19 @@ export default function Home() {
   const [bills, setBills] = useState<Bill[] | []>([]);
   const [editMode, setEditMode] = useState(true); //set to false
   const [finished, setFinished] = useState(false);
-  //hardcoded date
   const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
+  const [filterNeeded, setFilterNeeded] = useState(Boolean);
   const dateChanged = (value: string) => {
     setSelectedDate(new Date(value));
     fetchNewDate(new Date(value));
   }
   const fetchNewDate = async (givenDate: Date) => {
     setFinished(false);
+    if ((givenDate.getMonth()+1)%2 == 0 ) {
+      setFilterNeeded(false);
+    } else {
+      setFilterNeeded(true);
+    }
     let shortDate=(givenDate.getFullYear().toString()+'.'+(givenDate.getMonth()+1).toString());
     console.log(shortDate);
     const promises = [getBills(shortDate, setBills, setFinished)];
@@ -129,7 +134,8 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
             </tr>
           </thead>
           <tbody>
-          {bills?.map((bill: Bill, i) =>(
+            {/* get all when it's bimonth or else get only non-bimonthly */}
+          {bills?.filter((entry:any) => (!filterNeeded || !entry.bimonthly)).map((bill: Bill, i) =>(
             <tr key={bill.id}>
             <td className='md:text-md text-sm'>{bill.name}</td>
             <td className='md:text-md text-sm'>

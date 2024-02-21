@@ -37,31 +37,33 @@ export default function Home() {
     let valid=true;
     //validate if all fields are filled
     bills.forEach((element: Bill) => {
-      if (!element.amount) {
-        if (element.fixedAmount) {
-          element.amount=element.fixedAmountV;
-          validatedBills.push(element);
+      if (filterNeeded && element.bimonthly) {
         } else {
-          valid=false;
-        }
-      } else {
-        validatedBills.push(element);
-      }
-      if (!element.day) {
-        if (element.fixedDay) {
-          element.day=element.fixedDayV;
-          validatedBills.push(element);
+        if (!element.amount) {
+          if (element.fixedAmount) {
+            element.amount=element.fixedAmountV;
+            validatedBills.push(element);
+          } else {
+            valid=false;
+          }
         } else {
-          valid=false;
+          validatedBills.push(element);
         }
-      } else {
-        validatedBills.push(element);
+        if (!element.day) {
+          if (element.fixedDay) {
+            element.day=element.fixedDayV;
+            validatedBills.push(element);
+          } else {
+            valid=false;
+          }
+        } else {
+          validatedBills.push(element);
+        }
       }
     })
     if (valid) {
-      setBills(validatedBills);
       let shortDate=(selectedDate.getFullYear().toString()+'.'+(selectedDate.getMonth()+1).toString());
-      saveBills(shortDate, bills);
+      saveBills(shortDate, validatedBills);
     }
   }
   const [user, setUser] = useState<User>();

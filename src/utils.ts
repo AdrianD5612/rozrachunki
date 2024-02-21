@@ -87,6 +87,26 @@ export const getBillsToManage = async (setBills: any, setFinished: any) => {
 	}
 }
 
+export const saveManagedBills = async (newBills: any) => {
+	try {
+		newBills.forEach(async (element:any) => {
+			let reducedElement={...element};
+			delete reducedElement.id;	//dont want redundant id field in db
+			await setDoc(doc(db, "bills", element.id), reducedElement);
+		})
+	} catch(err) {
+		console.error(err)
+	}
+}
+
+export const deleteBill = async (id: string) => {
+	try {
+		await deleteDoc(doc(db, "bills", id));
+	} catch (err) {
+		console.error(err)
+	}
+}
+
 export const successMessage = (message:string) => {
 	toast.success(message, {
 		position: "top-right",

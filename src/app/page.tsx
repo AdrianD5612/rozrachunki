@@ -11,7 +11,7 @@ import { TuiDateMonthPicker } from 'nextjs-tui-date-picker';
 export default function Home() {
   const router = useRouter();
   const [bills, setBills] = useState<Bill[] | []>([]);
-  const [editMode, setEditMode] = useState(true); //set to false
+  const [editMode, setEditMode] = useState(false);
   const [finished, setFinished] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
   const [filterNeeded, setFilterNeeded] = useState(Boolean);
@@ -98,29 +98,6 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
         </>
         <input type="checkbox" id="editing" name="editing" checked={editMode} onChange={() => setEditMode(!editMode)}></input>
         <label htmlFor="editing">Tryb edycji</label><br></br>
-      </div>
-
-      <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm lg:flex">
-        <table className="text-white">
-          <thead>
-            <tr>
-              <th>Nazwa</th>
-              <th>Termin</th>
-              <th>Kwota</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bills?.map((bill: Bill) =>(
-            <tr key={bill.id}>
-            <td className='md:text-md text-sm'>{bill.name}</td>
-            <td className='md:text-md text-sm'>{bill.day}</td>
-            <td className='md:text-md text-sm'>{bill.amount}</td>
-            </tr>
-            ))}   
-          </tbody>
-        </table>
-
-
       </div>
 
       <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm lg:flex">

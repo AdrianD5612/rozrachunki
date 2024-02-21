@@ -47,7 +47,6 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 			} else {	//amount not yet exists
 			bills.push( { ...downloaded.data(), id: downloaded.id} );
 			collectionSize--;
-			//TODO push json z wartosciami pustymi i handle to pozniej
 			}
 			if (collectionSize === 0 ) setFinished(true);	//it is finished after fetching all "amounts" docs for every collection entry, without this table will be rendered incomplete
             }));

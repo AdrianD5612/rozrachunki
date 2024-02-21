@@ -37,7 +37,6 @@ export default function Home() {
     let valid=true;
     //validate if all fields are filled
     bills.forEach((element: Bill) => {
-      element.paid=false; //paid status not yet implemented
       if (!element.amount) {
         if (element.fixedAmount) {
           element.amount=element.fixedAmountV;

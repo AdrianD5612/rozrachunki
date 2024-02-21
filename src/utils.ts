@@ -19,7 +19,6 @@ export interface Bill {
 	name: string;
 	amount: number;
 	day: number;
-	paid: boolean;
   }
 
   export interface BillLite {
@@ -61,7 +60,7 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 export const saveBills = (date: string, newBills: Bill[]) => {
 	try {
 		newBills.forEach(async (element) => {
-		await setDoc(doc(db, "bills", element.id, 'amounts', date), {amount: element.amount, day: element.day, paid: element.paid});
+		await setDoc(doc(db, "bills", element.id, 'amounts', date), {amount: element.amount, day: element.day});
 		})
 
 	} catch(err) {
@@ -104,6 +103,21 @@ export const deleteBill = async (id: string) => {
 		await deleteDoc(doc(db, "bills", id));
 	} catch (err) {
 		console.error(err)
+	}
+}
+
+export const addBill = async () => {
+	try {
+		const docRef = await addDoc(collection(db, "bills"), {
+			bimonthly: false,
+			fixedAmount: false,
+			fixedAmountV: 0,
+			fixedDay: false,
+			fixedDayV: 0,
+			name: ''
+			  });
+	}	catch (err) {
+			console.error(err)
 	}
 }
 

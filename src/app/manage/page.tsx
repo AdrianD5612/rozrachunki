@@ -3,7 +3,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase';
 import { onAuthStateChanged } from "firebase/auth";
-import { User, BillLite, getBillsToManage, saveBills, deleteBill, saveManagedBills } from '@/utils';
+import { User, BillLite, getBillsToManage, saveBills, deleteBill, addBill, saveManagedBills } from '@/utils';
 import { TuiDateMonthPicker } from 'nextjs-tui-date-picker';
 
 export default function Home() {
@@ -139,6 +139,9 @@ export default function Home() {
                 ))} 
               </tbody>
             </table>
+          </div>
+          <div>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => addBill()}>Utwórz nowy</button>
           </div>
           <div>
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => saveManagedBills(bills)}>Zapisz zmiany</button>

@@ -34,7 +34,6 @@ export default function Home() {
   const uploadBills = () => {
     let validatedBills: Bill [];
     validatedBills=[];
-    let valid=true;
     //validate if all fields are filled
     bills.forEach((element: Bill) => {
       if (filterNeeded && element.bimonthly) {
@@ -44,7 +43,8 @@ export default function Home() {
             element.amount=element.fixedAmountV;
             validatedBills.push(element);
           } else {
-            valid=false;
+            element.amount=0;
+            validatedBills.push(element);
           }
         } else {
           validatedBills.push(element);
@@ -54,17 +54,17 @@ export default function Home() {
             element.day=element.fixedDayV;
             validatedBills.push(element);
           } else {
-            valid=false;
+            element.day=0;
+            validatedBills.push(element);
           }
         } else {
           validatedBills.push(element);
         }
       }
     })
-    if (valid) {
-      let shortDate=(selectedDate.getFullYear().toString()+'.'+(selectedDate.getMonth()+1).toString());
-      saveBills(shortDate, validatedBills);
-    }
+    //TODO DRY these if elses with push
+    let shortDate=(selectedDate.getFullYear().toString()+'.'+(selectedDate.getMonth()+1).toString());
+    saveBills(shortDate, validatedBills);
   }
   const [user, setUser] = useState<User>();
   const isUserLoggedIn = useCallback(() => {

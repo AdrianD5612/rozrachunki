@@ -4,7 +4,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase';
 import { onAuthStateChanged } from "firebase/auth";
-import { User, Bill, getBills, saveBills } from '@/utils';
+import { User, Bill, getBills, saveBills, getPaid, setPaidBool } from '@/utils';
 import { TuiDateMonthPicker } from 'nextjs-tui-date-picker';
 
 
@@ -15,6 +15,7 @@ export default function Home() {
   const [finished, setFinished] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
   const [filterNeeded, setFilterNeeded] = useState(Boolean);
+  const [paid, setPaid]= useState(true);
   const dateChanged = (value: string) => {
     setSelectedDate(new Date(value));
     fetchNewDate(new Date(value));
@@ -28,7 +29,7 @@ export default function Home() {
     }
     let shortDate=(givenDate.getFullYear().toString()+'.'+(givenDate.getMonth()+1).toString());
     console.log(shortDate);
-    const promises = [getBills(shortDate, setBills, setFinished)];
+    const promises = [getPaid(shortDate,setPaid), getBills(shortDate, setBills, setFinished)];
     await Promise.all(promises);
   }
   const uploadBills = () => {
@@ -65,6 +66,11 @@ export default function Home() {
     //TODO DRY these if elses with push
     let shortDate=(selectedDate.getFullYear().toString()+'.'+(selectedDate.getMonth()+1).toString());
     saveBills(shortDate, validatedBills);
+  }
+  const uploadPaid = (state: boolean) => {
+    setPaid(state);
+    let shortDate=(selectedDate.getFullYear().toString()+'.'+(selectedDate.getMonth()+1).toString());
+    setPaidBool(shortDate, state);
   }
   const [user, setUser] = useState<User>();
   const isUserLoggedIn = useCallback(() => {
@@ -163,6 +169,17 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
         display: editMode?"block":"none"
       }}>
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => uploadBills()}>Zapisz zmiany</button>
+      </div>
+      <div className="items-center justify-center lg:flex">
+      {paid? (
+        <><p className={`m-0 max-w-[30ch] opacity-80 text-emerald-500`}>
+            Wybrany miesiąc został już oznaczony jako opłacony 🎉
+          </p><button className="bg-rose-500 hover:bg-rose-600 active:bg-rose-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => uploadPaid(false)}>Nieopłacony</button></>
+      ) : (
+        <><p className={`m-0 max-w-[30ch] opacity-80 text-rose-500`}>
+            Wybrany miesiąc nie został jeszcze oznaczony jako opłacony ❌
+          </p><button className="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => uploadPaid(true)}>Opłacony</button></>
+      )}
       </div>
     </main>
   );

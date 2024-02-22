@@ -121,6 +121,28 @@ export const addBill = async () => {
 	}
 }
 
+export const getPaid = async (date: string, setPaid: any) => {
+	try {
+		const docRef = doc(db, 'months', date);
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists()) {
+			setPaid(docSnap.data().paid);
+        } else {
+			setPaid(false)
+		} 
+	} catch (err) {
+		setPaid(false);
+	}
+}
+
+export const setPaidBool = async (date: string, state: boolean) => {
+	try {
+		await setDoc(doc(db, "months", date), {paid: state});
+	}	catch (err) {
+			console.error(err)
+	}
+}
+
 export const successMessage = (message:string) => {
 	toast.success(message, {
 		position: "top-right",

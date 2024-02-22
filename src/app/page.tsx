@@ -120,7 +120,7 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
               {editMode ? (
                 <input
                   type="number"
-                  className='w-16'
+                  className='w-16 text-black'
                   value={bill.day ? (bill.day) : (bill.fixedDay? (bill.fixedDayV): NaN )}
                   onChange={(e) => {
                     const newValue = parseInt(e.target.value);
@@ -139,7 +139,7 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
               {editMode? (
                 <input
                   type="number"
-                  className='w-16'
+                  className='w-16 text-black'
                   value={bill.amount ? (bill.amount) : (bill.fixedAmount? (bill.fixedAmountV): NaN )}
                   onChange={(e) => {
                     const newValue = parseFloat(e.target.value);

@@ -20,14 +20,14 @@ export default function Home() {
       <form className="flex text-white  flex-col md:w-1/2 w-full mb-8" onSubmit={handleSubmit}>
         <label htmlFor="email">Email Address</label>
         <input type="email" name="email" id="email"
-          className="border-[1px] py-2 px-4 rounded mb-4" required
+          className="border-[1px] py-2 px-4 rounded mb-4 text-black" required
           value={email}
           onChange={e => setEmail(e.target.value)} 
           placeholder="admin@test.com"
         />
         <label htmlFor="password">Hasło</label>
         <input type="password" name="password" id="password" required
-          className="border-[1px] py-2 px-4 rounded  mb-4"
+          className="border-[1px] py-2 px-4 rounded  mb-4 text-black"
           value={password}
           onChange={e => setPassword(e.target.value)}
           placeholder="admin123"

@@ -123,7 +123,7 @@ export default function Home() {
                   className={bill.fixedAmount? enabledClass : disabledClass}
                   value={bill.fixedAmountV}
                   onChange={(e) => {
-                    const newValue = parseInt(e.target.value);
+                    const newValue = parseFloat(e.target.value);
                     setBills((prevBills: any) =>
                       prevBills.map((prevBill: BillLite) =>
                         prevBill.id === bill.id ? { ...prevBill, fixedAmountV: newValue } : prevBill

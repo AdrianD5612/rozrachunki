@@ -8,8 +8,8 @@ import { TuiDateMonthPicker } from 'nextjs-tui-date-picker';
 
 export default function Home() {
     const checkboxClass="text-blue-600 rounded focus:ring-blue-600 ring-offset-gray-800 bg-gray-700 border-gray-600";
-    const enabledClass='w-16 border-2 border-green-500 text-black';
-    const disabledClass='w-16 border-2 text-black';
+    const enabledClass='w-20 border-2 border-green-500 text-black';
+    const disabledClass='w-20 border-2 text-black';
     const router = useRouter();
     const [finished, setFinished] = useState(false);
     const [bills, setBills] = useState<BillLite[] | []>([]);

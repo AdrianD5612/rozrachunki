@@ -62,9 +62,10 @@ export const saveBills = (date: string, newBills: Bill[]) => {
 		newBills.forEach(async (element) => {
 		await setDoc(doc(db, "bills", element.id, 'amounts', date), {amount: element.amount, day: element.day});
 		})
-
+		successMessage("Zmiany pomyślnie zapisane 🎉")
 	} catch(err) {
 		console.error(err)
+		errorMessage("Nie udało się zapisać zmian ❌")
 	}
 
 }
@@ -93,16 +94,20 @@ export const saveManagedBills = async (newBills: any) => {
 			delete reducedElement.id;	//dont want redundant id field in db
 			await setDoc(doc(db, "bills", element.id), reducedElement);
 		})
+		successMessage("Zmiany pomyślnie zapisane 🎉");
 	} catch(err) {
-		console.error(err)
+		console.error(err);
+		errorMessage("Nie udało się zapisać zmian ❌");
 	}
 }
 
 export const deleteBill = async (id: string) => {
 	try {
 		await deleteDoc(doc(db, "bills", id));
+		successMessage("Pomyślnie usunięto wpis🎉");
 	} catch (err) {
 		console.error(err)
+		errorMessage("Nie udało się usunąć wpisu ❌");
 	}
 }
 
@@ -116,8 +121,10 @@ export const addBill = async () => {
 			fixedDayV: 0,
 			name: ''
 			  });
+		successMessage("Pomyślnie utworzono wpis🎉");
 	}	catch (err) {
-			console.error(err)
+			console.error(err);
+			errorMessage("Nie udało się utworzyć wpisu ❌");
 	}
 }
 
@@ -138,8 +145,10 @@ export const getPaid = async (date: string, setPaid: any) => {
 export const setPaidBool = async (date: string, state: boolean) => {
 	try {
 		await setDoc(doc(db, "months", date), {paid: state});
+		successMessage("Pomyślnie zmieiono stan opłacenia🎉");
 	}	catch (err) {
-			console.error(err)
+			console.error(err);
+			errorMessage("Nie udało się zmienić stanu opłcaenia ❌");
 	}
 }
 

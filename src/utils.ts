@@ -1,8 +1,10 @@
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "./firebase";
 import { toast } from "react-toastify";
-import { doc, deleteDoc, onSnapshot, collection, addDoc, query, where, serverTimestamp, orderBy, Timestamp, setDoc, getDocs, getDoc  } from "firebase/firestore";
+import { doc, deleteDoc, onSnapshot, collection, addDoc, query, where, serverTimestamp, orderBy, Timestamp, setDoc, getDocs, getDoc, updateDoc  } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, deleteObject, getDownloadURL } from "firebase/storage";
 import db from "./firebase";
+import axios from 'axios';
 
 export interface User {
     email: string | null,
@@ -19,6 +21,7 @@ export interface Bill {
 	name: string;
 	amount: number;
 	day: number;
+	file: boolean;
   }
 
   export interface BillLite {
@@ -30,7 +33,7 @@ export interface Bill {
 	fixedDayV: number;
 	name: string;
   }
-  
+
 export const getBills = async (date:  string, setBills: any, setFinished: any) => {
 	try {
 		const bills: any = []
@@ -60,7 +63,7 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 export const saveBills = (date: string, newBills: Bill[]) => {
 	try {
 		newBills.forEach(async (element) => {
-		await setDoc(doc(db, "bills", element.id, 'amounts', date), {amount: element.amount, day: element.day});
+		await updateDoc(doc(db, "bills", element.id, 'amounts', date), {amount: element.amount, day: element.day});
 		})
 		successMessage("Zmiany pomyślnie zapisane 🎉")
 	} catch(err) {
@@ -145,11 +148,69 @@ export const getPaid = async (date: string, setPaid: any) => {
 export const setPaidBool = async (date: string, state: boolean) => {
 	try {
 		await setDoc(doc(db, "months", date), {paid: state});
-		successMessage("Pomyślnie zmieiono stan opłacenia🎉");
+		successMessage("Pomyślnie zmieiono stan opłacenia 🎉");
 	}	catch (err) {
 			console.error(err);
 			errorMessage("Nie udało się zmienić stanu opłcaenia ❌");
 	}
+}
+
+export const uploadFile = (file: File, date: string, id: string) => {
+	const storage = getStorage();
+	const storageRef = ref(storage, date+'/'+id+'.pdf');
+	uploadBytes(storageRef, file).then(async (snapshot) => {	
+		const billRef = doc(db, "bills", id, 'amounts', date);
+		await updateDoc(billRef, {
+			file: true
+			});
+		successMessage('Przesłano fakturę 🎉');
+	}).catch((error) => {
+		console.error(error);
+		errorMessage("Nie udało się przesłać faktury ❌");
+	});
+}
+
+export const downloadFile = (date:string, id:string, name:string) => {
+	const storage = getStorage();
+	try {
+        getDownloadURL(ref(storage, date+'/'+id+'.pdf'))
+		.then((url) => {
+			axios({
+				url: url,
+				method: 'GET',
+				responseType: 'blob',
+			}).then((response) => {
+				const href = URL.createObjectURL(response.data);
+				// create "a" HTML element with href to file & click
+				const link = document.createElement('a');
+				link.href = href;
+				link.setAttribute('download', name+'.'+date+'.pdf');
+				document.body.appendChild(link);
+				link.click();
+				// clean up "a" element & remove ObjectURL
+				document.body.removeChild(link);
+				URL.revokeObjectURL(href);
+			});
+		})
+    } catch (error) {
+		console.error(error);
+		errorMessage("Nie udało się pobrać faktury ❌");
+    }
+}
+
+export const deleteFile = (date: string, id: string) => {
+	const storage = getStorage();
+	const desertRef = ref(storage, date+'/'+id+'.pdf');
+	deleteObject(desertRef).then(async () => {
+		const billRef = doc(db, "bills", id, 'amounts', date);
+		await updateDoc(billRef, {
+			file: false
+			});
+		successMessage('Faktura usunięta 🎉');
+	}).catch((error) => {
+		console.error(error);
+		errorMessage("Nie udało się usunąć faktury ❌");
+	});
 }
 
 export const successMessage = (message:string) => {

@@ -4,8 +4,9 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase';
 import { onAuthStateChanged } from "firebase/auth";
-import { User, Bill, getBills, saveBills, getPaid, setPaidBool } from '@/utils';
+import { User, Bill, getBills, saveBills, getPaid, setPaidBool, uploadFile, deleteFile, downloadFile } from '@/utils';
 import { TuiDateMonthPicker } from 'nextjs-tui-date-picker';
+import { MdDeleteForever, MdFolderOpen } from "react-icons/md";
 
 
 export default function Home() {
@@ -15,7 +16,7 @@ export default function Home() {
   const [finished, setFinished] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
   const [filterNeeded, setFilterNeeded] = useState(Boolean);
-  const [paid, setPaid]= useState(true);
+  const [paid, setPaid] = useState(true);
   const dateChanged = (value: string) => {
     setSelectedDate(new Date(value));
     fetchNewDate(new Date(value));
@@ -72,6 +73,12 @@ export default function Home() {
     let shortDate=(selectedDate.getFullYear().toString()+'.'+(selectedDate.getMonth()+1).toString());
     setPaidBool(shortDate, state);
   }
+  const prepareUploadFile = (file: File| undefined, id: string) => {
+    if (file != undefined) {
+      let shortDate=(selectedDate.getFullYear().toString()+'.'+(selectedDate.getMonth()+1).toString());
+      uploadFile(file, shortDate, id);
+    }
+  }
   const [user, setUser] = useState<User>();
   const isUserLoggedIn = useCallback(() => {
 		onAuthStateChanged(auth, async (user) => {
@@ -115,6 +122,7 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
               <th>Nazwa</th>
               <th>Termin</th>
               <th>Kwota</th>
+              <th>Faktura</th>
             </tr>
           </thead>
           <tbody>
@@ -158,6 +166,38 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
                 />
               ) : (
                 bill.amount
+              )}
+            </td>
+            <td>
+              {bill.file? (
+                <><MdFolderOpen 
+                    className="text-3xl text-green-500 cursor-pointer"
+                    onClick={() => {
+                      downloadFile((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), bill.id, bill.name);
+                    }}
+                  />
+                <MdDeleteForever
+                    className="text-3xl text-red-500 cursor-pointer"
+                    onClick={() => {
+                      deleteFile((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), bill.id);
+                      setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, file: false } : prevBill
+                      )
+                      );
+                    } } /></>
+              ) : (
+              <input
+              type="file"
+              name="file"
+              className="block w-full mb-5 text-xs border rounded-lg cursor-pointer text-gray-400 focus:outline-none bg-gray-700 border-gray-600 placeholder-gray-400"
+              onChange={(e) => {
+                prepareUploadFile(e.target.files?.[0], bill.id);
+                setBills((prevBills: any) =>
+                  prevBills.map((prevBill: Bill) =>
+                    prevBill.id === bill.id ? { ...prevBill, file: true } : prevBill
+                  )
+                );
+              }}
+              />
               )}
             </td>
             </tr>

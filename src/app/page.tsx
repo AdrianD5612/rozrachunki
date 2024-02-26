@@ -169,36 +169,45 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
               )}
             </td>
             <td>
-              {bill.file? (
-                <><MdFolderOpen 
+              {editMode? (
+                (bill.file? (
+                  <MdDeleteForever
+                  className="text-3xl text-red-500 cursor-pointer"
+                  onClick={() => {
+                    deleteFile((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), bill.id);
+                    setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, file: false } : prevBill
+                    )
+                    );
+                  } } />
+                ) : (
+                  <input
+                  type="file"
+                  name="file"
+                  className="block w-full mb-5 text-xs border rounded-lg cursor-pointer text-gray-400 focus:outline-none bg-gray-700 border-gray-600 placeholder-gray-400"
+                  onChange={(e) => {
+                    prepareUploadFile(e.target.files?.[0], bill.id);
+                    setBills((prevBills: any) =>
+                      prevBills.map((prevBill: Bill) =>
+                        prevBill.id === bill.id ? { ...prevBill, file: true } : prevBill
+                      )
+                    );
+                  }}
+                  />
+                ) )
+              ) : (
+                (bill.file? (
+                  <MdFolderOpen 
                     className="text-3xl text-green-500 cursor-pointer"
                     onClick={() => {
                       downloadFile((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), bill.id, bill.name);
                     }}
                   />
-                <MdDeleteForever
-                    className="text-3xl text-red-500 cursor-pointer"
-                    onClick={() => {
-                      deleteFile((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), bill.id);
-                      setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, file: false } : prevBill
-                      )
-                      );
-                    } } /></>
-              ) : (
-              <input
-              type="file"
-              name="file"
-              className="block w-full mb-5 text-xs border rounded-lg cursor-pointer text-gray-400 focus:outline-none bg-gray-700 border-gray-600 placeholder-gray-400"
-              onChange={(e) => {
-                prepareUploadFile(e.target.files?.[0], bill.id);
-                setBills((prevBills: any) =>
-                  prevBills.map((prevBill: Bill) =>
-                    prevBill.id === bill.id ? { ...prevBill, file: true } : prevBill
-                  )
-                );
-              }}
-              />
-              )}
+                ) : (
+                  <p></p>
+                )
+              )
+              )
+              }
             </td>
             </tr>
             ))} 

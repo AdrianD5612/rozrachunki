@@ -42,28 +42,20 @@ export default function Home() {
         if (!element.amount) {
           if (element.fixedAmount) {
             element.amount=element.fixedAmountV;
-            validatedBills.push(element);
           } else {
             element.amount=0;
-            validatedBills.push(element);
           }
-        } else {
-          validatedBills.push(element);
         }
         if (!element.day) {
           if (element.fixedDay) {
             element.day=element.fixedDayV;
-            validatedBills.push(element);
           } else {
             element.day=0;
-            validatedBills.push(element);
           }
-        } else {
-          validatedBills.push(element);
         }
+        validatedBills.push(element);
       }
     })
-    //TODO DRY these if elses with push
     let shortDate=(selectedDate.getFullYear().toString()+'.'+(selectedDate.getMonth()+1).toString());
     saveBills(shortDate, validatedBills);
   }

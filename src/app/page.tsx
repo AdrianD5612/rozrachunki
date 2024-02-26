@@ -29,7 +29,6 @@ export default function Home() {
       setFilterNeeded(true);
     }
     let shortDate=(givenDate.getFullYear().toString()+'.'+(givenDate.getMonth()+1).toString());
-    console.log(shortDate);
     const promises = [getPaid(shortDate,setPaid), getBills(shortDate, setBills, setFinished)];
     await Promise.all(promises);
   }

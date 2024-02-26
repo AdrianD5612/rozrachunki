@@ -53,7 +53,6 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 			if (collectionSize === 0 ) setFinished(true);	//it is finished after fetching all "amounts" docs for every collection entry, without this table will be rendered incomplete
             }));
 		setBills(bills)
-		console.log(bills)
 	} catch (err) {
 		console.error(err)
 		setBills([])
@@ -82,7 +81,6 @@ export const getBillsToManage = async (setBills: any, setFinished: any) => {
             });
 			setBills(docs);
 			setFinished(true);
-			console.log(docs);
         }) 
 	} catch (err) {
 		console.error(err)

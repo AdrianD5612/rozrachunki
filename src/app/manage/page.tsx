@@ -133,7 +133,14 @@ export default function Home() {
                 />
                 </td>
                 <td>
-                  <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => deleteBill(bill.id)}>Usuń</button>
+                  <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => {
+                      const isConfirmed = confirm("Czy na pewno chcesz usunąć ten wpis wraz z jego historią?")
+                      if (isConfirmed) {
+                        deleteBill(bill.id)
+                      }
+                  }
+                  }
+                    >Usuń</button>
                 </td>
                 </tr>
                 ))} 

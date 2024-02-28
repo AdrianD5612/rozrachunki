@@ -87,13 +87,13 @@ export default function Home() {
     isUserLoggedIn()
 }, [isUserLoggedIn]);
 
-if (!finished) return  <div className="flex justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">Ładowanie, proszę czekać...</div>
+if (!finished) return  <div className="flex justify-center border-b border-neutral-800 bg-gradient-to-b from-zinc-600/30 pb-6 pt-8 backdrop-blur-2xl lg:static lg:w-auto lg:rounded-xl lg:p-4">Ładowanie, proszę czekać...</div>
   return (
-    <main className="flex flex-col items-center justify-center p-24 border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:p-4 lg:bg-zinc-800/30">
-      <div className="z-10 w-0 from-black via-black items-center justify-center font-mono text-sm lg:flex">
+    <main className="flex flex-col items-center justify-center p-24 border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:p-4">
+      <div className="z-10 w-0 from-black via-black items-center justify-center font-mono text-sm flex">
         <button className="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => router.push("/manage")}>Zarządzaj</button>
       </div>
-      <div className="z-10 w-0 from-black via-black items-center justify-center font-mono text-sm lg:flex">
+      <div className="z-10 w-0 from-black via-black items-center justify-end lg:justify-center font-sans text-sm flex">
         <>
           <TuiDateMonthPicker
             handleChange={dateChanged}
@@ -106,7 +106,7 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
         <label htmlFor="editing">Tryb edycji</label><br></br>
       </div>
 
-      <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm lg:flex">
+      <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm flex">
         <table className="text-white">
           <thead>
             <tr>
@@ -210,7 +210,7 @@ if (!finished) return  <div className="flex justify-center border-b border-gray-
       }}>
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => uploadBills()}>Zapisz zmiany</button>
       </div>
-      <div className="items-center justify-center lg:flex">
+      <div className="items-center justify-center flex">
       {paid? (
         <><p className={`m-0 max-w-[30ch] opacity-80 text-emerald-500`}>
             Wybrany miesiąc został już oznaczony jako opłacony 🎉

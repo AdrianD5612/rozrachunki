@@ -53,6 +53,9 @@ export default function Home() {
             element.day=0;
           }
         }
+        if (!element.file) {
+          element.file=false;
+        }
         validatedBills.push(element);
       }
     })

@@ -62,7 +62,7 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 export const saveBills = (date: string, newBills: Bill[]) => {
 	try {
 		newBills.forEach(async (element) => {
-		await updateDoc(doc(db, "bills", element.id, 'amounts', date), {amount: element.amount, day: element.day});
+		await setDoc(doc(db, "bills", element.id, 'amounts', date), {amount: element.amount, day: element.day, file: element.file});
 		})
 		successMessage("Zmiany pomyślnie zapisane 🎉")
 	} catch(err) {

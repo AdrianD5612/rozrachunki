@@ -210,31 +210,35 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
           </tbody>
         </table>
       </div>
-      <div style={{
+      <div className="mt-2 items-center justify-center flex" style={{
         display: editMode? "block":"none"
       }}>
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => uploadBills()}>Zapisz zmiany</button>
       </div>
-      <div style={{
+      <div className="mt-2 items-center justify-end flex" style={{
         display: editMode? "block":"none"
       }}>
-          <input
-            type="text"
-            id="noteInput"
-            name="noteInput"
-            className={inputClass+' w-auto'}
-            value={note}
-            onChange={(e) => {setNote(e.target.value)}}
-          />
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => setMonthNote((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), note)}>Zapisz notatkę</button>
+          <div>
+            <input
+              type="text"
+              id="noteInput"
+              name="noteInput"
+              className={inputClass+' w-auto'}
+              value={note}
+              onChange={(e) => {setNote(e.target.value)}}
+            />
+          </div>
+          <div className="mt-2 items-center justify-center flex">
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => setMonthNote((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), note)}>Zapisz notatkę</button>
+          </div>
       </div>
-      <div style={{
+      <div className="mt-2 items-center justify-center flex" style={{
         // display label when not editing and note exists
         display: editMode? "none": (note==''? "none" : "block")
       }}>
         <label>{note}</label>
       </div>
-      <div className="items-center justify-center flex">
+      <div className="mt-2 items-center justify-center flex">
       {paid? (
         <><p className={`m-0 max-w-[30ch] opacity-80 text-emerald-500`}>
             Wybrany miesiąc został już oznaczony jako opłacony 🎉

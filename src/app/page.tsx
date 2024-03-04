@@ -4,12 +4,13 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase';
 import { onAuthStateChanged } from "firebase/auth";
-import { User, Bill, getBills, saveBills, getPaid, setPaidBool, uploadFile, deleteFile, downloadFile } from '@/utils';
+import { User, Bill, getBills, saveBills, getMonthData, setPaidBool, setMonthNote, uploadFile, deleteFile, downloadFile } from '@/utils';
 import { TuiDateMonthPicker } from 'nextjs-tui-date-picker';
 import { MdDeleteForever, MdFolderOpen } from "react-icons/md";
 
 
 export default function Home() {
+  const inputClass = "w-16 text-white bg-zinc-400/30";
   const router = useRouter();
   const [bills, setBills] = useState<Bill[] | []>([]);
   const [editMode, setEditMode] = useState(false);
@@ -17,6 +18,7 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
   const [filterNeeded, setFilterNeeded] = useState(Boolean);
   const [paid, setPaid] = useState(true);
+  const [note, setNote] = useState(String);
   const dateChanged = (value: string) => {
     setSelectedDate(new Date(value));
     fetchNewDate(new Date(value));
@@ -29,7 +31,7 @@ export default function Home() {
       setFilterNeeded(true);
     }
     let shortDate=(givenDate.getFullYear().toString()+'.'+(givenDate.getMonth()+1).toString());
-    const promises = [getPaid(shortDate,setPaid), getBills(shortDate, setBills, setFinished)];
+    const promises = [getMonthData(shortDate,setPaid, setNote), getBills(shortDate, setBills, setFinished)];
     await Promise.all(promises);
   }
   const uploadBills = () => {
@@ -128,7 +130,7 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
               {editMode ? (
                 <input
                   type="number"
-                  className='w-16 text-black'
+                  className={inputClass}
                   value={bill.day ? (bill.day) : (bill.fixedDay? (bill.fixedDayV): NaN )}
                   onChange={(e) => {
                     const newValue = parseInt(e.target.value);
@@ -147,7 +149,7 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
               {editMode? (
                 <input
                   type="number"
-                  className='w-16 text-black'
+                  className={inputClass}
                   value={bill.amount ? (bill.amount) : (bill.fixedAmount? (bill.fixedAmountV): NaN )}
                   onChange={(e) => {
                     const newValue = parseFloat(e.target.value);
@@ -209,9 +211,28 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
         </table>
       </div>
       <div style={{
-        display: editMode?"block":"none"
+        display: editMode? "block":"none"
       }}>
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => uploadBills()}>Zapisz zmiany</button>
+      </div>
+      <div style={{
+        display: editMode? "block":"none"
+      }}>
+          <input
+            type="text"
+            id="noteInput"
+            name="noteInput"
+            className={inputClass+' w-auto'}
+            value={note}
+            onChange={(e) => {setNote(e.target.value)}}
+          />
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => setMonthNote((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), note)}>Zapisz notatkę</button>
+      </div>
+      <div style={{
+        // display label when not editing and note exists
+        display: editMode? "none": (note==''? "none" : "block")
+      }}>
+        <label>{note}</label>
       </div>
       <div className="items-center justify-center flex">
       {paid? (

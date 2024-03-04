@@ -129,14 +129,16 @@ export const addBill = async () => {
 	}
 }
 
-export const getPaid = async (date: string, setPaid: any) => {
+export const getMonthData = async (date: string, setPaid: any, setNote: any) => {
 	try {
 		const docRef = doc(db, 'months', date);
 		const docSnap = await getDoc(docRef);
 		if (docSnap.exists()) {
 			setPaid(docSnap.data().paid);
+			docSnap.data().note? setNote(docSnap.data().note) : setNote('');
         } else {
-			setPaid(false)
+			setPaid(false);
+			setNote('');
 		} 
 	} catch (err) {
 		setPaid(false);
@@ -145,11 +147,35 @@ export const getPaid = async (date: string, setPaid: any) => {
 
 export const setPaidBool = async (date: string, state: boolean) => {
 	try {
-		await setDoc(doc(db, "months", date), {paid: state});
-		successMessage("Pomyślnie zmieiono stan opłacenia 🎉");
+		const docRef = doc(db, 'months', date);
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists()) {
+			await updateDoc(doc(db, "months", date), {paid: state});
+			successMessage("Pomyślnie zmieiono stan opłacenia 🎉");
+		} else {
+			await setDoc(doc(db, "months", date), {paid: state});
+			successMessage("Pomyślnie zmieiono stan opłacenia 🎉");
+		}
 	}	catch (err) {
 			console.error(err);
-			errorMessage("Nie udało się zmienić stanu opłcaenia ❌");
+			errorMessage("Nie udało się zmienić stanu opłacaenia ❌");
+	}
+}
+
+export const setMonthNote = async (date: string, entry: string) => {
+	try {
+		const docRef = doc(db, 'months', date);
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists()) {
+			await updateDoc(doc(db, "months", date), {note: entry});
+			successMessage("Pomyślnie zapisano notatkę 🎉");
+		} else {
+			await setDoc(doc(db, "months", date), {note: entry});
+			successMessage("Pomyślnie zapisano notatkę 🎉");
+		}
+	}	catch (err) {
+			console.error(err);
+			errorMessage("Nie udało się zapisać notatki ❌");
 	}
 }
 
@@ -164,7 +190,7 @@ export const uploadFile = (file: File, date: string, id: string) => {
 		successMessage('Przesłano fakturę 🎉');
 	}).catch((error) => {
 		console.error(error);
-		errorMessage("Nie udało się przesłać faktury ❌");
+		errorMessage("Nie udało się przesłać faktury ❌ Sprawdź, czy zapisałeś wcześniej dany miesiąc");
 	});
 }
 

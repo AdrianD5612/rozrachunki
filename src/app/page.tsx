@@ -97,6 +97,7 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
     <main className="flex flex-col items-center justify-center p-24 border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:p-4">
       <div className="z-10 w-0 from-black via-black items-center justify-center font-mono text-sm flex">
         <button className="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => router.push("/manage")}>Zarządzaj</button>
+        <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={() => router.push("/misc")}>Pozostałe</button>
       </div>
       <div className="z-10 w-0 from-black via-black items-center justify-end lg:justify-center font-sans text-sm flex">
         <>

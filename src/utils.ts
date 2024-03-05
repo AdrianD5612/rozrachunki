@@ -34,6 +34,13 @@ export interface Bill {
 	name: string;
   }
 
+  export interface MiscBill {
+	id: string;
+	name: string;
+	amount: number;
+	active: boolean;
+  }
+
 export const getBills = async (date:  string, setBills: any, setFinished: any) => {
 	try {
 		const bills: any = []
@@ -235,6 +242,60 @@ export const deleteFile = (date: string, id: string) => {
 		console.error(error);
 		errorMessage("Nie udało się usunąć faktury ❌");
 	});
+}
+
+export const getMiscBills = async (setBills: any, setFinished: any) => {
+	try {
+        const unsub = onSnapshot(collection(db, "misc"), doc => {
+            const docs: any = []
+            doc.forEach((d: any) => {
+              docs.push( { ...d.data(), id: d.id })
+            });
+			setBills(docs);
+			setFinished(true);
+        }) 
+	} catch (err) {
+		console.error(err)
+		setBills([])
+	}
+}
+
+export const addMiscBill = async () => {
+	try {
+		const docRef = await addDoc(collection(db, "misc"), {
+			amount: 0,
+			active: true,
+			name: ''
+			  });
+		successMessage("Pomyślnie utworzono wpis🎉");
+	}	catch (err) {
+			console.error(err);
+			errorMessage("Nie udało się utworzyć wpisu ❌");
+	}
+}
+
+export const deleteMiscBill = async (id: string) => {
+	try {
+		await deleteDoc(doc(db, "misc", id));
+		successMessage("Pomyślnie usunięto wpis🎉");
+	} catch (err) {
+		console.error(err)
+		errorMessage("Nie udało się usunąć wpisu ❌");
+	}
+}
+
+export const saveMiscBills = async (newBills: any) => {
+	try {
+		newBills.forEach(async (element:any) => {
+			let reducedElement={...element};
+			delete reducedElement.id;	//dont want redundant id field in db
+			await setDoc(doc(db, "misc", element.id), reducedElement);
+		})
+		successMessage("Zmiany pomyślnie zapisane 🎉");
+	} catch(err) {
+		console.error(err);
+		errorMessage("Nie udało się zapisać zmian ❌");
+	}
 }
 
 export const successMessage = (message:string) => {

@@ -41,6 +41,13 @@ export interface Bill {
 	active: boolean;
   }
 
+/**
+ * Retrieves bills data from the database and updates the state accordingly.
+ *
+ * @param {string} date - the date for which to retrieve bills data
+ * @param {any} setBills - the function to update the bills state
+ * @param {any} setFinished - the function to update the finished state
+ */
 export const getBills = async (date:  string, setBills: any, setFinished: any) => {
 	try {
 		const bills: any = []
@@ -66,6 +73,12 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 	}
 }
 
+/**
+ * Save bills for a specific date.
+ *
+ * @param {string} date - the date for which the bills are being saved
+ * @param {Bill[]} newBills - an array of new bills to be saved
+ */
 export const saveBills = (date: string, newBills: Bill[]) => {
 	try {
 		newBills.forEach(async (element) => {
@@ -79,6 +92,12 @@ export const saveBills = (date: string, newBills: Bill[]) => {
 
 }
 
+/**
+ * Asynchronous function to retrieve bills to manage and update the state accordingly.
+ *
+ * @param {any} setBills - function to set the bills state
+ * @param {any} setFinished - function to set the finished state
+ */
 export const getBillsToManage = async (setBills: any, setFinished: any) => {
 	try {
         const unsub = onSnapshot(collection(db, "bills"), doc => {
@@ -95,6 +114,11 @@ export const getBillsToManage = async (setBills: any, setFinished: any) => {
 	}
 }
 
+/**
+ * Save managed bills to the database.
+ *
+ * @param {any} newBills - array of new bills to be saved
+ */
 export const saveManagedBills = async (newBills: any) => {
 	try {
 		newBills.forEach(async (element:any) => {
@@ -109,6 +133,11 @@ export const saveManagedBills = async (newBills: any) => {
 	}
 }
 
+/**
+ * Asynchronously deletes a bill from the database.
+ *
+ * @param {string} id - The ID of the bill to be deleted
+ */
 export const deleteBill = async (id: string) => {
 	try {
 		await deleteDoc(doc(db, "bills", id));
@@ -119,6 +148,10 @@ export const deleteBill = async (id: string) => {
 	}
 }
 
+/**
+ * Function to add a bill to the database asynchronously.
+ *
+ */
 export const addBill = async () => {
 	try {
 		const docRef = await addDoc(collection(db, "bills"), {
@@ -136,6 +169,13 @@ export const addBill = async () => {
 	}
 }
 
+/**
+ * Asynchronously retrieves data for a specific month and sets the 'paid' and 'note' state variables accordingly.
+ *
+ * @param {string} date - the date of the month to retrieve data for
+ * @param {any} setPaid - function to set the 'paid' state variable
+ * @param {any} setNote - function to set the 'note' state variable
+ */
 export const getMonthData = async (date: string, setPaid: any, setNote: any) => {
 	try {
 		const docRef = doc(db, 'months', date);
@@ -152,6 +192,12 @@ export const getMonthData = async (date: string, setPaid: any, setNote: any) => 
 	}
 }
 
+/**
+ * Function to set the paid status for a given date in the database.
+ *
+ * @param {string} date - the date for which to set the paid status
+ * @param {boolean} state - the paid status to set
+ */
 export const setPaidBool = async (date: string, state: boolean) => {
 	try {
 		const docRef = doc(db, 'months', date);
@@ -169,6 +215,12 @@ export const setPaidBool = async (date: string, state: boolean) => {
 	}
 }
 
+/**
+ * Set a note for a specific month in the database.
+ *
+ * @param {string} date - the date of the month
+ * @param {string} entry - the note to be set
+ */
 export const setMonthNote = async (date: string, entry: string) => {
 	try {
 		const docRef = doc(db, 'months', date);
@@ -186,6 +238,13 @@ export const setMonthNote = async (date: string, entry: string) => {
 	}
 }
 
+/**
+ * Uploads a file to the storage and updates the bill document in the database.
+ *
+ * @param {File} file - The file to be uploaded
+ * @param {string} date - The date of the bill
+ * @param {string} id - The ID of the bill
+ */
 export const uploadFile = (file: File, date: string, id: string) => {
 	const storage = getStorage();
 	const storageRef = ref(storage, date+'/'+id+'.pdf');
@@ -201,6 +260,13 @@ export const uploadFile = (file: File, date: string, id: string) => {
 	});
 }
 
+/**
+ * Downloads a file from the storage using the provided date, id, and name.
+ *
+ * @param {string} date - the date of the file
+ * @param {string} id - the id of the file
+ * @param {string} name - the name of the file
+ */
 export const downloadFile = (date:string, id:string, name:string) => {
 	const storage = getStorage();
 	try {
@@ -229,6 +295,12 @@ export const downloadFile = (date:string, id:string, name:string) => {
     }
 }
 
+/**
+ * Deletes a file from storage and updates the corresponding bill document.
+ *
+ * @param {string} date - the date of the file
+ * @param {string} id - the id of the file
+ */
 export const deleteFile = (date: string, id: string) => {
 	const storage = getStorage();
 	const desertRef = ref(storage, date+'/'+id+'.pdf');
@@ -244,6 +316,12 @@ export const deleteFile = (date: string, id: string) => {
 	});
 }
 
+/**
+ * Asynchronous function to fetch miscellaneous bills from the database and update the state with the retrieved data.
+ *
+ * @param {any} setBills - A function to set the state with the retrieved bills
+ * @param {any} setFinished - A function to set the flag indicating that the data retrieval is finished
+ */
 export const getMiscBills = async (setBills: any, setFinished: any) => {
 	try {
         const unsub = onSnapshot(collection(db, "misc"), doc => {
@@ -260,6 +338,10 @@ export const getMiscBills = async (setBills: any, setFinished: any) => {
 	}
 }
 
+/**
+ * Function to add a miscellaneous bill asynchronously.
+ *
+ */
 export const addMiscBill = async () => {
 	try {
 		const docRef = await addDoc(collection(db, "misc"), {
@@ -274,6 +356,11 @@ export const addMiscBill = async () => {
 	}
 }
 
+/**
+ * Delete a miscellaneous bill by ID.
+ *
+ * @param {string} id - The ID of the bill to be deleted
+ */
 export const deleteMiscBill = async (id: string) => {
 	try {
 		await deleteDoc(doc(db, "misc", id));
@@ -284,6 +371,11 @@ export const deleteMiscBill = async (id: string) => {
 	}
 }
 
+/**
+ * Save miscellaneous bills to the database
+ *
+ * @param {any} newBills - array of new bills to be saved
+ */
 export const saveMiscBills = async (newBills: any) => {
 	try {
 		newBills.forEach(async (element:any) => {
@@ -298,6 +390,11 @@ export const saveMiscBills = async (newBills: any) => {
 	}
 }
 
+/**
+ * Displays a success message using the toast library.
+ *
+ * @param {string} message - The message to be displayed
+ */
 export const successMessage = (message:string) => {
 	toast.success(message, {
 		position: "top-right",
@@ -310,6 +407,11 @@ export const successMessage = (message:string) => {
 		theme: "light",
 	});
 };
+/**
+ * Displays an error message using a toast notification.
+ *
+ * @param {string} message - The error message to be displayed
+ */
 export const errorMessage = (message:string) => {
 	toast.error(message, {
 		position: "top-right",
@@ -323,6 +425,13 @@ export const errorMessage = (message:string) => {
 	});
 };
 
+/**
+ * Logs in the user with the provided email and password.
+ *
+ * @param {string} email - the user's email
+ * @param {string} password - the user's password
+ * @param {any} router - the router object for navigation
+ */
 export const LoginUser = (email: string, password: string, router: any) => {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -336,6 +445,11 @@ export const LoginUser = (email: string, password: string, router: any) => {
         });
 };
 
+/**
+ * Logs the user out and navigates to the login page.
+ *
+ * @param {any} router - the router object for navigation
+ */
 export const LogOut = (router: any) => {
 	signOut(auth)
 		.then(() => {

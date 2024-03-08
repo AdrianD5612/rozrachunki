@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, BillLite, getBillsToManage, saveBills, deleteBill, addBill, saveManagedBills } from '@/utils';
+import { User, BillLite, getBillsToManage, saveBills, deleteBill, addBill, saveManagedBills, LogOut } from '@/utils';
 
 export default function Home() {
     const checkboxClass="text-blue-600 rounded focus:ring-blue-600 ring-offset-gray-800 bg-gray-700 border-gray-600";
@@ -25,6 +25,7 @@ export default function Home() {
     
           <div className=" from-black via-black items-center justify-center font-mono text-sm lg:flex">
             <button className="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => router.push("/")}>Strona główna</button>
+            <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={() => LogOut(router)}>Wyloguj</button>
           </div>
 
           <div className="max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm lg:flex">

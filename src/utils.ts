@@ -22,7 +22,7 @@ export interface Bill {
 	amount: number;
 	day: number;
 	file: boolean;
-  }
+}
 
   export interface BillLite {
 	id: string;
@@ -32,14 +32,18 @@ export interface Bill {
 	fixedDay: boolean;
 	fixedDayV: number;
 	name: string;
-  }
+}
 
   export interface MiscBill {
 	id: string;
 	name: string;
 	amount: number;
 	active: boolean;
-  }
+}
+
+function getUid() {
+	return auth.currentUser? auth.currentUser.uid : 'error';
+}
 
 /**
  * Retrieves bills data from the database and updates the state accordingly.
@@ -50,12 +54,13 @@ export interface Bill {
  */
 export const getBills = async (date:  string, setBills: any, setFinished: any) => {
 	try {
+		const uid = getUid();
 		const bills: any = []
-		const q = query(collection(db, "bills"));
+		const q = query(collection(db, uid+"Bills"));
 		const querySnapshot = await getDocs(q);
 		let collectionSize=querySnapshot.size;	//amount of different bills
 		querySnapshot.forEach((async downloaded => {
-			const docRef = doc(db, 'bills' , downloaded.id, 'amounts', date);
+			const docRef = doc(db, uid+"Bills", downloaded.id, 'amounts', date);
 			const docSnap = await getDoc(docRef);
 			if (docSnap.exists()) {
 				bills.push( { ...downloaded.data(), id: downloaded.id, ...docSnap.data() });
@@ -81,8 +86,9 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
  */
 export const saveBills = (date: string, newBills: Bill[]) => {
 	try {
+		const uid = getUid();
 		newBills.forEach(async (element) => {
-		await setDoc(doc(db, "bills", element.id, 'amounts', date), {amount: element.amount, day: element.day, file: element.file});
+		await setDoc(doc(db, uid+"Bills", element.id, 'amounts', date), {amount: element.amount, day: element.day, file: element.file});
 		})
 		successMessage("Zmiany pomyślnie zapisane 🎉")
 	} catch(err) {
@@ -100,7 +106,8 @@ export const saveBills = (date: string, newBills: Bill[]) => {
  */
 export const getBillsToManage = async (setBills: any, setFinished: any) => {
 	try {
-        const unsub = onSnapshot(collection(db, "bills"), doc => {
+		const uid = getUid();
+        const unsub = onSnapshot(collection(db, uid+"Bills"), doc => {
             const docs: any = []
             doc.forEach((d: any) => {
               docs.push( { ...d.data(), id: d.id })
@@ -121,10 +128,11 @@ export const getBillsToManage = async (setBills: any, setFinished: any) => {
  */
 export const saveManagedBills = async (newBills: any) => {
 	try {
+		const uid = getUid();
 		newBills.forEach(async (element:any) => {
 			let reducedElement={...element};
 			delete reducedElement.id;	//dont want redundant id field in db
-			await setDoc(doc(db, "bills", element.id), reducedElement);
+			await setDoc(doc(db, uid+"Bills", element.id), reducedElement);
 		})
 		successMessage("Zmiany pomyślnie zapisane 🎉");
 	} catch(err) {
@@ -140,7 +148,8 @@ export const saveManagedBills = async (newBills: any) => {
  */
 export const deleteBill = async (id: string) => {
 	try {
-		await deleteDoc(doc(db, "bills", id));
+		const uid = getUid();
+		await deleteDoc(doc(db, uid+"Bills", id));
 		successMessage("Pomyślnie usunięto wpis🎉");
 	} catch (err) {
 		console.error(err)
@@ -154,7 +163,8 @@ export const deleteBill = async (id: string) => {
  */
 export const addBill = async () => {
 	try {
-		const docRef = await addDoc(collection(db, "bills"), {
+		const uid = getUid();
+		const docRef = await addDoc(collection(db, uid+"Bills"), {
 			bimonthly: false,
 			fixedAmount: false,
 			fixedAmountV: 0,
@@ -178,7 +188,8 @@ export const addBill = async () => {
  */
 export const getMonthData = async (date: string, setPaid: any, setNote: any) => {
 	try {
-		const docRef = doc(db, 'months', date);
+		const uid = getUid();
+		const docRef = doc(db, uid+'Months', date);
 		const docSnap = await getDoc(docRef);
 		if (docSnap.exists()) {
 			setPaid(docSnap.data().paid);
@@ -200,13 +211,14 @@ export const getMonthData = async (date: string, setPaid: any, setNote: any) => 
  */
 export const setPaidBool = async (date: string, state: boolean) => {
 	try {
-		const docRef = doc(db, 'months', date);
+		const uid = getUid();
+		const docRef = doc(db, uid+'Months', date);
 		const docSnap = await getDoc(docRef);
 		if (docSnap.exists()) {
-			await updateDoc(doc(db, "months", date), {paid: state});
+			await updateDoc(doc(db, uid+"Months", date), {paid: state});
 			successMessage("Pomyślnie zmieiono stan opłacenia 🎉");
 		} else {
-			await setDoc(doc(db, "months", date), {paid: state});
+			await setDoc(doc(db, uid+"Months", date), {paid: state});
 			successMessage("Pomyślnie zmieiono stan opłacenia 🎉");
 		}
 	}	catch (err) {
@@ -223,13 +235,14 @@ export const setPaidBool = async (date: string, state: boolean) => {
  */
 export const setMonthNote = async (date: string, entry: string) => {
 	try {
-		const docRef = doc(db, 'months', date);
+		const uid = getUid();
+		const docRef = doc(db, uid+'Months', date);
 		const docSnap = await getDoc(docRef);
 		if (docSnap.exists()) {
-			await updateDoc(doc(db, "months", date), {note: entry});
+			await updateDoc(doc(db, uid+"Months", date), {note: entry});
 			successMessage("Pomyślnie zapisano notatkę 🎉");
 		} else {
-			await setDoc(doc(db, "months", date), {note: entry});
+			await setDoc(doc(db, uid+"Months", date), {note: entry});
 			successMessage("Pomyślnie zapisano notatkę 🎉");
 		}
 	}	catch (err) {
@@ -324,7 +337,8 @@ export const deleteFile = (date: string, id: string) => {
  */
 export const getMiscBills = async (setBills: any, setFinished: any) => {
 	try {
-        const unsub = onSnapshot(collection(db, "misc"), doc => {
+		const uid = getUid();
+        const unsub = onSnapshot(collection(db, uid+"Misc"), doc => {
             const docs: any = []
             doc.forEach((d: any) => {
               docs.push( { ...d.data(), id: d.id })
@@ -344,7 +358,8 @@ export const getMiscBills = async (setBills: any, setFinished: any) => {
  */
 export const addMiscBill = async () => {
 	try {
-		const docRef = await addDoc(collection(db, "misc"), {
+		const uid = getUid();
+		const docRef = await addDoc(collection(db, uid+"Misc"), {
 			amount: 0,
 			active: true,
 			name: ''
@@ -363,7 +378,8 @@ export const addMiscBill = async () => {
  */
 export const deleteMiscBill = async (id: string) => {
 	try {
-		await deleteDoc(doc(db, "misc", id));
+		const uid = getUid();
+		await deleteDoc(doc(db, uid+"Misc", id));
 		successMessage("Pomyślnie usunięto wpis🎉");
 	} catch (err) {
 		console.error(err)
@@ -378,10 +394,11 @@ export const deleteMiscBill = async (id: string) => {
  */
 export const saveMiscBills = async (newBills: any) => {
 	try {
+		const uid = getUid();
 		newBills.forEach(async (element:any) => {
 			let reducedElement={...element};
 			delete reducedElement.id;	//dont want redundant id field in db
-			await setDoc(doc(db, "misc", element.id), reducedElement);
+			await setDoc(doc(db, uid+"Misc", element.id), reducedElement);
 		})
 		successMessage("Zmiany pomyślnie zapisane 🎉");
 	} catch(err) {

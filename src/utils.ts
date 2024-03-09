@@ -263,7 +263,7 @@ export const uploadFile = (file: File, date: string, id: string) => {
 	const storage = getStorage();
 	const storageRef = ref(storage, uid+'/'+date+'/'+id+'.pdf');
 	uploadBytes(storageRef, file).then(async (snapshot) => {	
-		const billRef = doc(db, "bills", id, 'amounts', date);
+		const billRef = doc(db, uid+"Bills", id, 'amounts', date);
 		await updateDoc(billRef, {
 			file: true
 			});
@@ -321,7 +321,7 @@ export const deleteFile = (date: string, id: string) => {
 	const storage = getStorage();
 	const desertRef = ref(storage, uid+'/'+date+'/'+id+'.pdf');
 	deleteObject(desertRef).then(async () => {
-		const billRef = doc(db, "bills", id, 'amounts', date);
+		const billRef = doc(db, uid+"Bills", id, 'amounts', date);
 		await updateDoc(billRef, {
 			file: false
 			});

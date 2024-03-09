@@ -259,8 +259,9 @@ export const setMonthNote = async (date: string, entry: string) => {
  * @param {string} id - The ID of the bill
  */
 export const uploadFile = (file: File, date: string, id: string) => {
+	const uid = getUid();
 	const storage = getStorage();
-	const storageRef = ref(storage, date+'/'+id+'.pdf');
+	const storageRef = ref(storage, uid+'/'+date+'/'+id+'.pdf');
 	uploadBytes(storageRef, file).then(async (snapshot) => {	
 		const billRef = doc(db, "bills", id, 'amounts', date);
 		await updateDoc(billRef, {
@@ -283,7 +284,8 @@ export const uploadFile = (file: File, date: string, id: string) => {
 export const downloadFile = (date:string, id:string, name:string) => {
 	const storage = getStorage();
 	try {
-        getDownloadURL(ref(storage, date+'/'+id+'.pdf'))
+		const uid = getUid();
+        getDownloadURL(ref(storage, uid+'/'+date+'/'+id+'.pdf'))
 		.then((url) => {
 			axios({
 				url: url,
@@ -315,8 +317,9 @@ export const downloadFile = (date:string, id:string, name:string) => {
  * @param {string} id - the id of the file
  */
 export const deleteFile = (date: string, id: string) => {
+	const uid = getUid();
 	const storage = getStorage();
-	const desertRef = ref(storage, date+'/'+id+'.pdf');
+	const desertRef = ref(storage, uid+'/'+date+'/'+id+'.pdf');
 	deleteObject(desertRef).then(async () => {
 		const billRef = doc(db, "bills", id, 'amounts', date);
 		await updateDoc(billRef, {

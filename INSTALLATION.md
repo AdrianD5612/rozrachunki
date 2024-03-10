@@ -15,6 +15,9 @@ NEXT_PUBLIC_projectId=""
 NEXT_PUBLIC_storageBucket=""
 ```
 
+> [!IMPORTANT]  
+> While this type of env variables are exposed to client so he can make direct connection himself, it is alright in case of Firebase backend, because data is protected by security rules and "App check" feature. [More details here](https://stackoverflow.com/questions/37482366/is-it-safe-to-expose-firebase-apikey-to-the-public).
+
 - Run the development server:
 
 ```bash

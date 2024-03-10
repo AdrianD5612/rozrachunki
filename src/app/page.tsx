@@ -132,7 +132,7 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
                 <input
                   type="number"
                   className={inputClass}
-                  value={bill.day ? (bill.day) : (bill.fixedDay? (bill.fixedDayV): NaN )}
+                  value={bill.day ? (bill.day) : (bill.fixedDay? (bill.fixedDayV): '' )}
                   onChange={(e) => {
                     const newValue = parseInt(e.target.value);
                     setBills((prevBills: any) =>
@@ -151,7 +151,7 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
                 <input
                   type="number"
                   className={inputClass}
-                  value={bill.amount ? (bill.amount) : (bill.fixedAmount? (bill.fixedAmountV): NaN )}
+                  value={bill.amount ? (bill.amount) : (bill.fixedAmount? (bill.fixedAmountV): '' )}
                   onChange={(e) => {
                     const newValue = parseFloat(e.target.value);
                     setBills((prevBills: any) =>

@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import { MiscBill, getMiscBills, addMiscBill, deleteMiscBill, saveMiscBills } from '@/utils';
 
 export default function Home() {
+    const enabledClass='text-green-300';
+    const disabledClass='text-red-300';
     const router = useRouter();
     const [finished, setFinished] = useState(false);
     const [bills, setBills] = useState<MiscBill[] | []>([]);
@@ -33,7 +35,9 @@ export default function Home() {
                   <th>Nazwa</th>
                   <th>Kwota</th>
                   <th>Aktywne</th>
+                  {editMode &&
                   <th>Usuń</th>
+                  }
                 </tr>
               </thead>
               <tbody>
@@ -55,7 +59,8 @@ export default function Home() {
                     }}
                   />
                   ) : (
-                    bill.name
+                    <p className={bill.active? enabledClass : disabledClass}>
+                      {bill.name}</p>
                   )
                   }
                 </td>
@@ -75,7 +80,8 @@ export default function Home() {
                     }}
                   />
                   ) : (
-                    bill.amount
+                    <p className={bill.active? enabledClass : disabledClass}>
+                    {bill.amount}</p>
                   )
                   }
                 </td>
@@ -95,12 +101,18 @@ export default function Home() {
                     }}
                   />
                   ) : (
-                    bill.active? "Aktywne" : "Nieaktywne"
+                    <input
+                    type="checkbox"
+                    className='w-16'
+                    checked={bill.active}
+                    readOnly
+                    />
                   )
                   }
                   
                 </td>
-                <td>
+                {editMode &&
+                  <td>
                   <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => {
                       const isConfirmed = confirm("Czy na pewno chcesz usunąć ten wpis?")
                       if (isConfirmed) {
@@ -109,7 +121,7 @@ export default function Home() {
                   }
                   }
                     >Usuń</button>
-                </td>
+                  </td>}
                 </tr>
                 ))} 
               </tbody>

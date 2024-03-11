@@ -60,15 +60,16 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 		const querySnapshot = await getDocs(q);
 		let collectionSize=querySnapshot.size;	//amount of different bills
 		querySnapshot.forEach((async downloaded => {
-			const docRef = doc(db, uid+"Bills", downloaded.id, 'amounts', date);
-			const docSnap = await getDoc(docRef);
-			if (docSnap.exists()) {
-				bills.push( { ...downloaded.data(), id: downloaded.id, ...docSnap.data() });
-				collectionSize--;
-			} else {	//amount not yet exists
-			bills.push( { ...downloaded.data(), id: downloaded.id} );
-			collectionSize--;
+			if (!downloaded.data().deleted) {
+				const docRef = doc(db, uid+"Bills", downloaded.id, 'amounts', date);
+				const docSnap = await getDoc(docRef);
+				if (docSnap.exists()) {
+					bills.push( { ...downloaded.data(), id: downloaded.id, ...docSnap.data() });
+				} else {	//amount not yet exists
+				bills.push( { ...downloaded.data(), id: downloaded.id} );
+				}
 			}
+			collectionSize--;
 			if (collectionSize === 0 ) setFinished(true);	//it is finished after fetching all "amounts" docs for every collection entry, without this table will be rendered incomplete
             }));
 		setBills(bills)
@@ -110,7 +111,9 @@ export const getBillsToManage = async (setBills: any, setFinished: any) => {
         const unsub = onSnapshot(collection(db, uid+"Bills"), doc => {
             const docs: any = []
             doc.forEach((d: any) => {
-              docs.push( { ...d.data(), id: d.id })
+			  if (!d.data().deleted) {
+				docs.push( { ...d.data(), id: d.id });
+			  }
             });
 			setBills(docs);
 			setFinished(true);
@@ -142,15 +145,16 @@ export const saveManagedBills = async (newBills: any) => {
 }
 
 /**
- * Asynchronously deletes a bill from the database.
+ * Asynchronously marks a bill as deleted from the database.
  *
- * @param {string} id - The ID of the bill to be deleted
+ * @param {string} id - The ID of the bill to be marked as deleted
  */
 export const deleteBill = async (id: string) => {
 	try {
 		const uid = getUid();
-		await deleteDoc(doc(db, uid+"Bills", id));
-		successMessage("Pomyślnie usunięto wpis🎉");
+		await updateDoc(doc(db, uid+"Bills", id), {deleted: true}).then(() => {
+			successMessage("Pomyślnie usunięto wpis 🎉");
+		})
 	} catch (err) {
 		console.error(err)
 		errorMessage("Nie udało się usunąć wpisu ❌");

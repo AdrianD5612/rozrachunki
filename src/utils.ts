@@ -2,7 +2,7 @@ import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "./firebase";
 import { toast } from "react-toastify";
 import { doc, deleteDoc, onSnapshot, collection, addDoc, query, where, serverTimestamp, orderBy, Timestamp, setDoc, getDocs, getDoc, updateDoc  } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, deleteObject, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytesResumable, deleteObject, getDownloadURL } from "firebase/storage";
 import db from "./firebase";
 import axios from 'axios';
 
@@ -266,16 +266,43 @@ export const uploadFile = (file: File, date: string, id: string) => {
 	const uid = getUid();
 	const storage = getStorage();
 	const storageRef = ref(storage, uid+'/'+date+'/'+id+'.pdf');
-	uploadBytes(storageRef, file).then(async (snapshot) => {	
-		const billRef = doc(db, uid+"Bills", id, 'amounts', date);
-		await updateDoc(billRef, {
-			file: true
-			});
-		successMessage('Przesłano fakturę 🎉');
-	}).catch((error) => {
-		console.error(error);
-		errorMessage("Nie udało się przesłać faktury ❌ Sprawdź, czy zapisałeś wcześniej dany miesiąc");
-	});
+	const uploadTask = uploadBytesResumable(storageRef, file);
+	uploadTask.on('state_changed',
+		(snapshot) => {
+			// Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+		}, 
+		(error) => {
+			// A full list of error codes is available at
+			// https://firebase.google.com/docs/storage/web/handle-errors
+			switch (error.code) {
+			case 'storage/unauthorized':
+				errorMessage("Nie udało się przesłać faktury ❌ Rozmiar powinien być mniejszy od 3 MB");
+				break;
+			case 'storage/canceled':
+				errorMessage("Przesyłanie zostało anulowane ❌");
+				break;
+			case 'storage/unknown':
+				errorMessage("Nie udało się przesłać faktury z powodu nieznanego błędu ❌");
+				break;
+			}
+		}, 
+		async () => {
+			// success
+			const billRef = doc(db, uid+"Bills", id, 'amounts', date);
+			const docSnap = await getDoc(billRef);
+			if (docSnap.exists()) {
+				await updateDoc(billRef, {
+					file: true
+					});
+				successMessage("Pomyślnie zapisano notatkę 🎉");
+			} else {
+				await setDoc(billRef, {
+					file: true
+					});
+				successMessage("Pomyślnie zapisano notatkę 🎉");
+			}
+			}
+	);
 }
 
 /**

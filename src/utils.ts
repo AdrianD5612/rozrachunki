@@ -171,11 +171,13 @@ export const deleteBill = async (id: string) => {
 	}
 }
 
+
 /**
- * Function to add a bill to the database asynchronously.
+ * Async function to add a bill to the database.
  *
+ * @param {number} nextOrder - The order of the next bill
  */
-export const addBill = async () => {
+export const addBill = async (nextOrder: number) => {
 	try {
 		const uid = getUid();
 		const docRef = await addDoc(collection(db, uid+"Bills"), {
@@ -184,7 +186,8 @@ export const addBill = async () => {
 			fixedAmountV: 0,
 			fixedDay: false,
 			fixedDayV: 0,
-			name: ''
+			name: '',
+			order: nextOrder
 			  });
 		successMessage("Pomyślnie utworzono wpis🎉");
 	}	catch (err) {

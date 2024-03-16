@@ -184,7 +184,7 @@ export default function Home() {
             </table>
           </div>
           <div>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => addBill()}>Utwórz nowy</button>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => addBill(bills.length)}>Utwórz nowy</button>
           </div>
           <div>
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => saveManagedBills(bills)}>Zapisz zmiany</button>

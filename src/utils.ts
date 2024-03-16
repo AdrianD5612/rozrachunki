@@ -12,6 +12,7 @@ export interface User {
 }
 
 export interface Bill {
+	//TODO inherit billlite?
 	id: string;
 	bimonthly: boolean;
 	fixedAmount: boolean;
@@ -19,6 +20,7 @@ export interface Bill {
 	fixedDay: boolean;
 	fixedDayV: number;
 	name: string;
+	order: number;
 	amount: number;
 	day: number;
 	file: boolean;
@@ -32,6 +34,7 @@ export interface Bill {
 	fixedDay: boolean;
 	fixedDayV: number;
 	name: string;
+	order: number;
 }
 
   export interface MiscBill {
@@ -70,9 +73,12 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 				}
 			}
 			collectionSize--;
-			if (collectionSize === 0 ) setFinished(true);	//it is finished after fetching all "amounts" docs for every collection entry, without this table will be rendered incomplete
-            }));
-		setBills(bills)
+			if (collectionSize === 0 ) {
+				bills.sort((a:any, b:any) => (a.order || bills.indexOf(a)) - (b.order || bills.indexOf(b)) );
+				setFinished(true);	//it is finished after fetching all "amounts" docs for every collection entry, without this table will be rendered incomplete
+			}
+			}));
+		setBills(bills);
 	} catch (err) {
 		console.error(err)
 		setBills([])

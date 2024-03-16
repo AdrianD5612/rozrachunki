@@ -11,7 +11,7 @@ export interface User {
     uid: string | null
 }
 
-export interface Bill {
+export interface BillLite {
 	id: string;
 	bimonthly: boolean;
 	fixedAmount: boolean;
@@ -19,22 +19,16 @@ export interface Bill {
 	fixedDay: boolean;
 	fixedDayV: number;
 	name: string;
+	order: number;
+}
+
+export interface Bill extends BillLite {
 	amount: number;
 	day: number;
 	file: boolean;
 }
 
-  export interface BillLite {
-	id: string;
-	bimonthly: boolean;
-	fixedAmount: boolean;
-	fixedAmountV: number;
-	fixedDay: boolean;
-	fixedDayV: number;
-	name: string;
-}
-
-  export interface MiscBill {
+export interface MiscBill {
 	id: string;
 	name: string;
 	amount: number;
@@ -70,9 +64,18 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 				}
 			}
 			collectionSize--;
-			if (collectionSize === 0 ) setFinished(true);	//it is finished after fetching all "amounts" docs for every collection entry, without this table will be rendered incomplete
-            }));
-		setBills(bills)
+			if (collectionSize === 0 ) {	//all bills have been fetched
+				//fix null order fields
+				bills.forEach((bill:any, index: number) => {
+					if (!bill.hasOwnProperty('order') || bill.order === null || Number.isNaN(bill.order)) {
+						bills[index].order = index;
+					}
+				});
+				bills.sort((a:any, b:any) => a.order - b.order);
+				setFinished(true);	//it is finished after fetching all "amounts" docs for every collection entry, without this table will be rendered incomplete
+			}
+			}));
+		setBills(bills);
 	} catch (err) {
 		console.error(err)
 		setBills([])
@@ -115,6 +118,13 @@ export const getBillsToManage = async (setBills: any, setFinished: any) => {
 				docs.push( { ...d.data(), id: d.id });
 			  }
             });
+			//fix null order fields
+			docs.forEach((bill:any, index: number) => {
+				if (!bill.hasOwnProperty('order') || bill.order === null || Number.isNaN(bill.order)) {
+					docs[index].order = index;
+				}
+			});
+			docs.sort((a:any, b:any) => a.order - b.order);
 			setBills(docs);
 			setFinished(true);
         }) 

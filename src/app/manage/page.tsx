@@ -1,7 +1,8 @@
 "use client"
 import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, BillLite, getBillsToManage, saveBills, deleteBill, addBill, saveManagedBills, LogOut } from '@/utils';
+import { User, BillLite, getBillsToManage, saveBills, deleteBill, addBill, saveManagedBills, errorMessage, LogOut } from '@/utils';
+import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
 
 export default function Home() {
     const checkboxClass="text-blue-600 rounded focus:ring-blue-600 ring-offset-gray-800 bg-gray-700 border-gray-600";
@@ -32,6 +33,7 @@ export default function Home() {
             <table className="text-white">
               <thead>
                 <tr>
+                  <th> </th>
                   <th>Nazwa</th>
                   <th>Cykliczność</th>
                   <th>Stały termin</th>
@@ -42,6 +44,42 @@ export default function Home() {
               <tbody>
               {bills?.map((bill: BillLite, i) =>(
                 <tr key={bill.id}>
+                <td className='md:text-md text-sm items-center justify-center'>
+                  <MdArrowUpward
+                  className="text-white cursor-pointer"
+                  onClick={() => {
+                    const newBills = [...bills];
+                    const currentIndex = newBills.findIndex((billTemp: BillLite) => billTemp.id === bill.id);
+                    const previousIndex = currentIndex - 1;
+                    if (previousIndex >= 0) {
+                      const currentBill = newBills[currentIndex];
+                      const previousBill = newBills[previousIndex];
+                      newBills[currentIndex] = { ...currentBill, order: currentBill.order - 1 };
+                      newBills[previousIndex] = { ...previousBill, order: previousBill.order + 1 };
+                      saveManagedBills(newBills);
+                    } else {
+                      errorMessage('Nie mogę przenieść wpisu wyżej');
+                    }
+                  }}
+                  />
+                  <MdArrowDownward
+                  className="text-white cursor-pointer"
+                  onClick={() => {
+                    const newBills = [...bills];
+                    const currentIndex = newBills.findIndex((billTemp: BillLite) => billTemp.id === bill.id);
+                    const nextIndex = currentIndex + 1;
+                    if (nextIndex < newBills.length) {
+                      const currentBill = newBills[currentIndex];
+                      const nextBill = newBills[nextIndex];
+                      newBills[currentIndex] = { ...currentBill, order: currentBill.order + 1 };
+                      newBills[nextIndex] = { ...nextBill, order: nextBill.order - 1 };
+                      saveManagedBills(newBills);
+                    } else {
+                      errorMessage('Nie mogę przenieść wpisu niżej');
+                    }
+                  }}
+                  />
+                </td>
                 <td className='md:text-md text-sm'>
                   <input
                     type="string"

@@ -1,7 +1,8 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { MiscBill, getMiscBills, addMiscBill, deleteMiscBill, saveMiscBills } from '@/utils';
+import { MiscBill, getMiscBills, addMiscBill, deleteMiscBill, saveMiscBills, errorMessage } from '@/utils';
+import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
 
 export default function Home() {
     const enabledClass='text-white';
@@ -32,6 +33,9 @@ export default function Home() {
             <table className="text-white">
               <thead>
                 <tr>
+                  {editMode &&
+                  <th>#</th>
+                  }
                   <th>Nazwa</th>
                   <th>Kwota</th>
                   <th>Aktywne</th>
@@ -43,6 +47,44 @@ export default function Home() {
               <tbody>
               {bills?.map((bill: MiscBill, i) =>(
                 <tr key={bill.id}>
+                {editMode &&
+                  <td className='md:text-md text-sm items-center justify-center'>
+                    <MdArrowUpward
+                    className="text-white cursor-pointer"
+                    onClick={() => {
+                      const newBills = [...bills];
+                      const currentIndex = newBills.findIndex((billTemp: MiscBill) => billTemp.id === bill.id);
+                      const previousIndex = currentIndex - 1;
+                      if (previousIndex >= 0) {
+                        const currentBill = newBills[currentIndex];
+                        const previousBill = newBills[previousIndex];
+                        newBills[currentIndex] = { ...currentBill, order: currentBill.order - 1 };
+                        newBills[previousIndex] = { ...previousBill, order: previousBill.order + 1 };
+                        saveMiscBills(newBills);
+                      } else {
+                        errorMessage('Nie mogę przenieść wpisu wyżej');
+                      }
+                    }}
+                    />
+                    <MdArrowDownward
+                    className="text-white cursor-pointer"
+                    onClick={() => {
+                      const newBills = [...bills];
+                      const currentIndex = newBills.findIndex((billTemp: MiscBill) => billTemp.id === bill.id);
+                      const nextIndex = currentIndex + 1;
+                      if (nextIndex < newBills.length) {
+                        const currentBill = newBills[currentIndex];
+                        const nextBill = newBills[nextIndex];
+                        newBills[currentIndex] = { ...currentBill, order: currentBill.order + 1 };
+                        newBills[nextIndex] = { ...nextBill, order: nextBill.order - 1 };
+                        saveMiscBills(newBills);
+                      } else {
+                        errorMessage('Nie mogę przenieść wpisu niżej');
+                      }
+                    }}
+                    />
+                  </td>
+                }
                 <td className='md:text-md text-sm'>
                   {editMode ? (
                   <input
@@ -128,7 +170,7 @@ export default function Home() {
             </table>
           </div>
           <div className="mt-2 items-center justify-center flex">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => addMiscBill()}>Utwórz nowy</button>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => addMiscBill(bills.length)}>Utwórz nowy</button>
           </div>
           <div className="mt-2 items-center justify-center flex">
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => saveMiscBills(bills)}>Zapisz zmiany</button>

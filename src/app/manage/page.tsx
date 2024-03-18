@@ -33,7 +33,7 @@ export default function Home() {
             <table className="text-white">
               <thead>
                 <tr>
-                  <th> </th>
+                  <th>#</th>
                   <th>Nazwa</th>
                   <th>Cykliczność</th>
                   <th>Stały termin</th>

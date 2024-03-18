@@ -33,6 +33,7 @@ export interface MiscBill {
 	name: string;
 	amount: number;
 	active: boolean;
+	order: number;
 }
 
 function getUid() {
@@ -390,6 +391,13 @@ export const getMiscBills = async (setBills: any, setFinished: any) => {
             doc.forEach((d: any) => {
               docs.push( { ...d.data(), id: d.id })
             });
+			//fix null order fields
+			docs.forEach((bill:any, index: number) => {
+				if (!bill.hasOwnProperty('order') || bill.order === null || Number.isNaN(bill.order)) {
+					docs[index].order = index;
+				}
+			});
+			docs.sort((a:any, b:any) => a.order - b.order);
 			setBills(docs);
 			setFinished(true);
         }) 
@@ -399,17 +407,20 @@ export const getMiscBills = async (setBills: any, setFinished: any) => {
 	}
 }
 
+
 /**
- * Function to add a miscellaneous bill asynchronously.
+ * Function to add a miscellaneous bill to the database.
  *
+ * @param {number} nextOrder - the order of the next bill
  */
-export const addMiscBill = async () => {
+export const addMiscBill = async (nextOrder: number) => {
 	try {
 		const uid = getUid();
 		const docRef = await addDoc(collection(db, uid+"Misc"), {
 			amount: 0,
 			active: true,
-			name: ''
+			name: '',
+			order: nextOrder
 			  });
 		successMessage("Pomyślnie utworzono wpis🎉");
 	}	catch (err) {

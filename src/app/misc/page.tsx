@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation';
 import { MiscBill, getMiscBills, addMiscBill, deleteMiscBill, saveMiscBills } from '@/utils';
 
 export default function Home() {
-    const enabledClass='text-green-300';
-    const disabledClass='text-red-300';
+    const enabledClass='text-white';
+    const disabledClass='text-gray-500';
     const router = useRouter();
     const [finished, setFinished] = useState(false);
     const [bills, setBills] = useState<MiscBill[] | []>([]);

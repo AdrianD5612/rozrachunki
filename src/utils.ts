@@ -84,7 +84,7 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 }
 
 /**
- * Save bills for a specific date.
+ * Save bills for a specific date. It will create corresponding month document if it doesn't exist yet.
  *
  * @param {string} date - the date for which the bills are being saved
  * @param {Bill[]} newBills - an array of new bills to be saved

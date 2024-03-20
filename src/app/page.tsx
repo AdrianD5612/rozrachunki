@@ -19,6 +19,7 @@ export default function Home() {
   const [filterNeeded, setFilterNeeded] = useState(Boolean);
   const [paid, setPaid] = useState(true);
   const [note, setNote] = useState(String);
+  const [unpaidList, setUnpaidList] = useState<String[] | []>([]);
   const dateChanged = (value: string) => {
     setSelectedDate(new Date(value));
     fetchNewDate(new Date(value));
@@ -31,7 +32,7 @@ export default function Home() {
       setFilterNeeded(true);
     }
     let shortDate=(givenDate.getFullYear().toString()+'.'+(givenDate.getMonth()+1).toString());
-    const promises = [getMonthData(shortDate,setPaid, setNote), getBills(shortDate, setBills, setFinished)];
+    const promises = [getMonthData(shortDate,setPaid, setNote, setUnpaidList), getBills(shortDate, setBills, setFinished)];
     await Promise.all(promises);
   }
   const uploadBills = () => {
@@ -111,7 +112,15 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
         <input type="checkbox" id="editing" name="editing" checked={editMode} onChange={() => setEditMode(!editMode)}></input>
         <label htmlFor="editing">Tryb edycji</label><br></br>
       </div>
-
+      <div className="mt-2 items-center justify-center flex text-red-500" style={{
+        //show only if there is at least one unpaid month
+        display: unpaidList.length>0 ? "block": "none"
+      }}>
+        <p>Niezapłacone miesiące:</p>
+        {unpaidList.map((unpaid: String) => (
+          <p>{unpaid}</p>
+        ))}
+      </div>
       <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm flex">
         <table className="text-white">
           <thead>
@@ -237,7 +246,7 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
         // display label when not editing and note exists
         display: editMode? "none": (note==''? "none" : "block")
       }}>
-        <label>{note}</label>
+        {note}
       </div>
       <div className="mt-2 items-center justify-center flex">
       {paid? (

@@ -89,12 +89,18 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
  * @param {string} date - the date for which the bills are being saved
  * @param {Bill[]} newBills - an array of new bills to be saved
  */
-export const saveBills = (date: string, newBills: Bill[]) => {
+export const saveBills = async (date: string, newBills: Bill[]) => {
 	try {
 		const uid = getUid();
 		newBills.forEach(async (element) => {
-		await setDoc(doc(db, uid+"Bills", element.id, 'amounts', date), {amount: element.amount, day: element.day, file: element.file});
+			await setDoc(doc(db, uid+"Bills", element.id, 'amounts', date), {amount: element.amount, day: element.day, file: element.file});
 		})
+		//creating blank month data too if not yet exists so unpaid scanning can detect it
+		const docRef = doc(db, uid+'Months', date);
+		const docSnap = await getDoc(docRef);
+		if (!docSnap.exists()) {
+			await setDoc(doc(db, uid+"Months", date), {paid: false, note: ''});
+        } 
 		successMessage("Zmiany pomyślnie zapisane 🎉")
 	} catch(err) {
 		console.error(err)
@@ -204,7 +210,7 @@ export const addBill = async (nextOrder: number) => {
  * @param {any} setPaid - function to set the 'paid' state variable
  * @param {any} setNote - function to set the 'note' state variable
  */
-export const getMonthData = async (date: string, setPaid: any, setNote: any) => {
+export const getMonthData = async (date: string, setPaid: any, setNote: any, setUnpaidMonths: any) => {
 	try {
 		const uid = getUid();
 		const docRef = doc(db, uid+'Months', date);
@@ -215,7 +221,26 @@ export const getMonthData = async (date: string, setPaid: any, setNote: any) => 
         } else {
 			setPaid(false);
 			setNote('');
-		} 
+		}
+		const q = query(collection(db, uid+"Months"));
+		const querySnapshot = await getDocs(q);
+		const unpaidMonths: string[] = [];
+		let collectionSize=querySnapshot.size;
+		const currentDate = new Date();
+		const currentMonth = currentDate.getMonth() + 1;
+		const currentYear = currentDate.getFullYear();
+		querySnapshot.forEach((async downloaded => {
+			const downloadedMonth= parseInt(downloaded.id.split('.')[1]);
+			const downloadedYear= parseInt(downloaded.id.split('.')[0]);
+			if (downloadedMonth < currentMonth && downloadedYear <= currentYear) {
+				if (downloaded.data().paid == false) unpaidMonths.push(downloaded.id);
+			}
+			collectionSize--;
+			if (collectionSize == 0) {
+				setUnpaidMonths(unpaidMonths);
+			}
+		}));
+
 	} catch (err) {
 		setPaid(false);
 	}

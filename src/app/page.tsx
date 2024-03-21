@@ -117,8 +117,8 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
         display: unpaidList.length>0 ? "block": "none"
       }}>
         <p>Niezapłacone miesiące:</p>
-        {unpaidList.map((unpaid: String) => (
-          <p>{unpaid}</p>
+        {unpaidList.map((unpaid: String, index: number) => (
+          <p key={index}>{unpaid}</p>
         ))}
       </div>
       <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm flex">

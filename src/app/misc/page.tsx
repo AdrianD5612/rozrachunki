@@ -169,12 +169,14 @@ export default function Home() {
               </tbody>
             </table>
           </div>
-          <div className="mt-2 items-center justify-center flex">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => addMiscBill(bills.length)}>Utwórz nowy</button>
-          </div>
-          <div className="mt-2 items-center justify-center flex">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => saveMiscBills(bills)}>Zapisz zmiany</button>
-          </div>
+          {editMode &&
+            <><div className="mt-2 items-center justify-center flex">
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => addMiscBill(bills.length)}>Utwórz nowy</button>
+              </div>
+              <div className="mt-2 items-center justify-center flex">
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => saveMiscBills(bills)}>Zapisz zmiany</button>
+              </div></>
+          }
       </main>
     )
 }

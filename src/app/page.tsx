@@ -252,11 +252,11 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
       {paid? (
         <><p className={`m-0 max-w-[30ch] opacity-80 text-emerald-500`}>
             Wybrany miesiąc został już oznaczony jako opłacony 🎉
-          </p><button className="bg-rose-500 hover:bg-rose-600 active:bg-rose-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => uploadPaid(false)}>Nieopłacony</button></>
+          </p><button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onClick={() => uploadPaid(false)}>Zmień</button></>
       ) : (
         <><p className={`m-0 max-w-[30ch] opacity-80 text-rose-500`}>
             Wybrany miesiąc nie został jeszcze oznaczony jako opłacony ❌
-          </p><button className="bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => uploadPaid(true)}>Opłacony</button></>
+          </p><button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onClick={() => uploadPaid(true)}>Zmień</button></>
       )}
       </div>
     </main>

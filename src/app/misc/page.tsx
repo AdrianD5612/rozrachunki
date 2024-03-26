@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { MiscBill, getMiscBills, addMiscBill, deleteMiscBill, saveMiscBills, errorMessage } from '@/utils';
 import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
+import { getTranslation } from '@/translations';
 
 export default function Home() {
     const enabledClass='text-white';
@@ -11,6 +12,7 @@ export default function Home() {
     const [finished, setFinished] = useState(false);
     const [bills, setBills] = useState<MiscBill[] | []>([]);
     const [editMode, setEditMode] = useState(false);
+    const t = (key: string) => getTranslation(key);
 
     useEffect(() => {
       let ignore = false;
@@ -19,15 +21,15 @@ export default function Home() {
       return () => { ignore = true; }
       },[]);
 
-    if (!finished) return  <div className="flex justify-center border-b border-neutral-800 bg-gradient-to-b from-zinc-600/30 pb-6 pt-8 backdrop-blur-2xl lg:static lg:w-auto lg:rounded-xl lg:p-4">Ładowanie, proszę czekać...</div>
+    if (!finished) return  <div className="flex justify-center border-b border-neutral-800 bg-gradient-to-b from-zinc-600/30 pb-6 pt-8 backdrop-blur-2xl lg:static lg:w-auto lg:rounded-xl lg:p-4">...</div>
     return (
       <main className="flex flex-col gap-1 items-center justify-center p-24 border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:p-4 lg:bg-zinc-800/30">
         <div className=" from-black via-black items-center justify-center font-mono text-sm lg:flex">
-          <button className="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => router.push("/")}>Strona główna</button>
+          <button className="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => router.push("/")}>{t("mainPage")}</button>
         </div>
         <div className="m-2 items-center justify-center flex">
         <input type="checkbox" id="editing" name="editing" checked={editMode} onChange={() => setEditMode(!editMode)}></input>
-        <label htmlFor="editing">Tryb edycji</label><br></br>
+        <label htmlFor="editing">{t("editMode")}</label><br></br>
         </div>
         <div className="max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm lg:flex">
             <table className="text-white">
@@ -36,11 +38,11 @@ export default function Home() {
                   {editMode &&
                   <th>#</th>
                   }
-                  <th>Nazwa</th>
-                  <th>Kwota</th>
-                  <th>Aktywne</th>
+                  <th>{t("name")}</th>
+                  <th>{t("amount")}</th>
+                  <th>{t("active")}</th>
                   {editMode &&
-                  <th>Usuń</th>
+                  <th>{t("delete")}</th>
                   }
                 </tr>
               </thead>
@@ -62,7 +64,7 @@ export default function Home() {
                         newBills[previousIndex] = { ...previousBill, order: previousBill.order + 1 };
                         saveMiscBills(newBills);
                       } else {
-                        errorMessage('Nie mogę przenieść wpisu wyżej');
+                        errorMessage(t('cantMoveUp'));
                       }
                     }}
                     />
@@ -79,7 +81,7 @@ export default function Home() {
                         newBills[nextIndex] = { ...nextBill, order: nextBill.order - 1 };
                         saveMiscBills(newBills);
                       } else {
-                        errorMessage('Nie mogę przenieść wpisu niżej');
+                        errorMessage(t('cantMoveDown'));
                       }
                     }}
                     />
@@ -156,13 +158,13 @@ export default function Home() {
                 {editMode &&
                   <td>
                   <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => {
-                      const isConfirmed = confirm("Czy na pewno chcesz usunąć ten wpis?")
+                      const isConfirmed = confirm(t("confirmDeleteMisc"))
                       if (isConfirmed) {
                         deleteMiscBill(bill.id)
                       }
                   }
                   }
-                    >Usuń</button>
+                    >{t("delete")}</button>
                   </td>}
                 </tr>
                 ))} 
@@ -171,10 +173,10 @@ export default function Home() {
           </div>
           {editMode &&
             <><div className="mt-2 items-center justify-center flex">
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => addMiscBill(bills.length)}>Utwórz nowy</button>
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => addMiscBill(bills.length)}>{t("createNew")}</button>
               </div>
               <div className="mt-2 items-center justify-center flex">
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => saveMiscBills(bills)}>Zapisz zmiany</button>
+                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => saveMiscBills(bills)}>{t("saveChanges")}</button>
               </div></>
           }
       </main>

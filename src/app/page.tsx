@@ -7,6 +7,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { User, Bill, getBills, saveBills, getMonthData, setPaidBool, setMonthNote, uploadFile, deleteFile, downloadFile } from '@/utils';
 import { TuiDateMonthPicker } from 'nextjs-tui-date-picker';
 import { MdDeleteForever, MdFolderOpen } from "react-icons/md";
+import { getTranslation } from '@/translations';
 
 
 export default function Home() {
@@ -80,7 +81,6 @@ export default function Home() {
   const isUserLoggedIn = useCallback(() => {
 		onAuthStateChanged(auth, async (user) => {
             if (user) {
-                //let shortDate=selectedDate.toString().substring(0,7);
                 setUser({ email: user.email, uid: user.uid });
                 fetchNewDate(selectedDate);
 			} else {
@@ -88,17 +88,18 @@ export default function Home() {
 			}
 		});
 	}, [router]);
+  const t = (key: string) => getTranslation(key);
 
   useEffect(() => {
     isUserLoggedIn()
 }, [isUserLoggedIn]);
 
-if (!finished) return  <div className="flex justify-center border-b border-neutral-800 bg-gradient-to-b from-zinc-600/30 pb-6 pt-8 backdrop-blur-2xl lg:static lg:w-auto lg:rounded-xl lg:p-4">Ładowanie, proszę czekać...</div>
+if (!finished) return  <div className="flex justify-center border-b border-neutral-800 bg-gradient-to-b from-zinc-600/30 pb-6 pt-8 backdrop-blur-2xl lg:static lg:w-auto lg:rounded-xl lg:p-4">...</div>
   return (
     <main className="flex flex-col items-center justify-center p-24 border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:p-4">
       <div className="z-10 w-0 from-black via-black items-center justify-center font-mono text-sm flex">
-        <button className="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => router.push("/manage")}>Zarządzaj</button>
-        <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={() => router.push("/misc")}>Pozostałe</button>
+        <button className="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => router.push("/manage")}>{t("manage")}</button>
+        <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={() => router.push("/misc")}>{t("misc")}</button>
       </div>
       <div className="z-10 w-0 from-black via-black items-center justify-end lg:justify-center font-sans text-sm flex">
         <>
@@ -110,13 +111,13 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
           />
         </>
         <input type="checkbox" id="editing" name="editing" checked={editMode} onChange={() => setEditMode(!editMode)}></input>
-        <label htmlFor="editing">Tryb edycji</label><br></br>
+        <label htmlFor="editing">{t("editMode")}</label><br></br>
       </div>
       <div className="mt-2 items-center justify-center flex text-red-500" style={{
         //show only if there is at least one unpaid month
         display: unpaidList.length>0 ? "block": "none"
       }}>
-        <p>Niezapłacone miesiące:</p>
+        <p>{t("unpaidMonths")}:</p>
         {unpaidList.map((unpaid: String, index: number) => (
           <p key={index}>{unpaid}</p>
         ))}
@@ -125,10 +126,10 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
         <table className="text-white">
           <thead>
             <tr>
-              <th>Nazwa</th>
-              <th>Termin</th>
-              <th>Kwota</th>
-              <th>Faktura</th>
+              <th>{t("name")}</th>
+              <th>{t("day")}</th>
+              <th>{t("amount")}</th>
+              <th>{t("file")}</th>
             </tr>
           </thead>
           <tbody>
@@ -223,7 +224,7 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
       <div className="mt-2 items-center justify-center flex" style={{
         display: editMode? "block":"none"
       }}>
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => uploadBills()}>Zapisz zmiany</button>
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => uploadBills()}>{t("saveChanges")}</button>
       </div>
       <div className="mt-2 items-center justify-end flex" style={{
         display: editMode? "block":"none"
@@ -239,7 +240,7 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
             />
           </div>
           <div className="mt-2 items-center justify-center flex">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => setMonthNote((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), note)}>Zapisz notatkę</button>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => setMonthNote((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), note)}>{t("saveNote")}</button>
           </div>
       </div>
       <div className="mt-2 items-center justify-center flex" style={{
@@ -251,12 +252,12 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
       <div className="mt-2 items-center justify-center flex">
       {paid? (
         <><p className={`m-0 max-w-[30ch] opacity-80 text-emerald-500`}>
-            Wybrany miesiąc został już oznaczony jako opłacony 🎉
-          </p><button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onClick={() => uploadPaid(false)}>Zmień</button></>
+            {t("monthIsPaid")}
+          </p><button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onClick={() => uploadPaid(false)}>{t("change")}</button></>
       ) : (
         <><p className={`m-0 max-w-[30ch] opacity-80 text-rose-500`}>
-            Wybrany miesiąc nie został jeszcze oznaczony jako opłacony ❌
-          </p><button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onClick={() => uploadPaid(true)}>Zmień</button></>
+            {t("monthIsNotPaid")}
+          </p><button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onClick={() => uploadPaid(true)}>{t("change")}</button></>
       )}
       </div>
     </main>

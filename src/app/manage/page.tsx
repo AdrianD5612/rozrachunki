@@ -3,6 +3,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, BillLite, getBillsToManage, saveBills, deleteBill, addBill, saveManagedBills, errorMessage, LogOut } from '@/utils';
 import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
+import { getTranslation , switchLang} from '@/translations';
+
 
 export default function Home() {
     const checkboxClass="text-blue-600 rounded focus:ring-blue-600 ring-offset-gray-800 bg-gray-700 border-gray-600";
@@ -11,7 +13,7 @@ export default function Home() {
     const router = useRouter();
     const [finished, setFinished] = useState(false);
     const [bills, setBills] = useState<BillLite[] | []>([]);
-
+    const t = (key: string) => getTranslation(key);
 
     useEffect(() => {
       let ignore = false;
@@ -20,13 +22,16 @@ export default function Home() {
       return () => { ignore = true; }
       },[]);
 
-    if (!finished) return  <div className="flex justify-center border-b border-neutral-800 bg-gradient-to-b from-zinc-600/30 pb-6 pt-8 backdrop-blur-2xl lg:static lg:w-auto lg:rounded-xl lg:p-4">Ładowanie, proszę czekać...</div>
+    if (!finished) return  <div className="flex justify-center border-b border-neutral-800 bg-gradient-to-b from-zinc-600/30 pb-6 pt-8 backdrop-blur-2xl lg:static lg:w-auto lg:rounded-xl lg:p-4">...</div>
     return (
         <main className="flex flex-col gap-1 items-center justify-center p-24 border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:p-4 lg:bg-zinc-800/30">
     
           <div className=" from-black via-black items-center justify-center font-mono text-sm lg:flex">
-            <button className="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => router.push("/")}>Strona główna</button>
-            <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={() => LogOut(router)}>Wyloguj</button>
+            <button className="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => router.push("/")}>{t("mainPage")}</button>
+            <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={() => {
+              switchLang()
+              router.refresh()}}>{t("switchLang")}</button>
+            <button className="bg-red-500 hover:bg-red-600 active:bg-red-700 focus:outline-none focus:ring focus:ring-red-300 py-2 px-4 rounded-full" onClick={() => LogOut(router)}>{t("logOut")}</button>
           </div>
 
           <div className="max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm lg:flex">
@@ -34,11 +39,11 @@ export default function Home() {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Nazwa</th>
-                  <th>Cykliczność</th>
-                  <th>Stały termin</th>
-                  <th>Stała kwota</th>
-                  <th>Usuń</th>
+                  <th>{t("name")}</th>
+                  <th>{t("frequency")}</th>
+                  <th>{t("fixedD")}</th>
+                  <th>{t("fixedA")}</th>
+                  <th>{t("delete")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -58,7 +63,7 @@ export default function Home() {
                       newBills[previousIndex] = { ...previousBill, order: previousBill.order + 1 };
                       saveManagedBills(newBills);
                     } else {
-                      errorMessage('Nie mogę przenieść wpisu wyżej');
+                      errorMessage(t("cantMoveUp"));
                     }
                   }}
                   />
@@ -75,7 +80,7 @@ export default function Home() {
                       newBills[nextIndex] = { ...nextBill, order: nextBill.order - 1 };
                       saveManagedBills(newBills);
                     } else {
-                      errorMessage('Nie mogę przenieść wpisu niżej');
+                      errorMessage(t("cantMoveDown"));
                     }
                   }}
                   />
@@ -110,7 +115,7 @@ export default function Home() {
                       );
                     }}
                   />
-                  <label htmlFor={bill.id}className="ms-1 text-sm font-medium text-gray-300">Co 2 miesiące</label>
+                  <label htmlFor={bill.id}className="ms-1 text-sm font-medium text-gray-300">{t("bimonthly")}</label>
                 </td>
                 <td className='md:text-md text-sm'>
                   <input
@@ -170,13 +175,13 @@ export default function Home() {
                 </td>
                 <td>
                   <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => {
-                      const isConfirmed = confirm("Czy na pewno chcesz usunąć ten wpis wraz z jego historią?")
+                      const isConfirmed = confirm(t("confirmDelete"));
                       if (isConfirmed) {
                         deleteBill(bill.id)
                       }
                   }
                   }
-                    >Usuń</button>
+                    >{t("delete")}</button>
                 </td>
                 </tr>
                 ))} 
@@ -184,10 +189,10 @@ export default function Home() {
             </table>
           </div>
           <div>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => addBill(bills.length)}>Utwórz nowy</button>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => addBill(bills.length)}>{t("createNew")}</button>
           </div>
           <div>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => saveManagedBills(bills)}>Zapisz zmiany</button>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => saveManagedBills(bills)}>{t("saveChanges")}</button>
           </div>
         </main>
     )

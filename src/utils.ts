@@ -5,6 +5,9 @@ import { doc, deleteDoc, onSnapshot, collection, addDoc, query, where, serverTim
 import { getStorage, ref, uploadBytesResumable, deleteObject, getDownloadURL } from "firebase/storage";
 import db from "./firebase";
 import axios from 'axios';
+import { getTranslation } from "./translations";
+
+const t = (key: string) => getTranslation(key);
 
 export interface User {
     email: string | null,
@@ -101,10 +104,10 @@ export const saveBills = async (date: string, newBills: Bill[]) => {
 		if (!docSnap.exists()) {
 			await setDoc(doc(db, uid+"Months", date), {paid: false, note: ''});
         } 
-		successMessage("Zmiany pomyślnie zapisane 🎉")
+		successMessage(t("saveSuccess"));
 	} catch(err) {
 		console.error(err)
-		errorMessage("Nie udało się zapisać zmian ❌")
+		errorMessage(t("saveFail"));
 	}
 
 }
@@ -154,10 +157,10 @@ export const saveManagedBills = async (newBills: any) => {
 			delete reducedElement.id;	//dont want redundant id field in db
 			await setDoc(doc(db, uid+"Bills", element.id), reducedElement);
 		})
-		successMessage("Zmiany pomyślnie zapisane 🎉");
+		successMessage(t("saveSuccess"));
 	} catch(err) {
 		console.error(err);
-		errorMessage("Nie udało się zapisać zmian ❌");
+		errorMessage(t("saveFail"));
 	}
 }
 
@@ -170,11 +173,11 @@ export const deleteBill = async (id: string) => {
 	try {
 		const uid = getUid();
 		await updateDoc(doc(db, uid+"Bills", id), {deleted: true}).then(() => {
-			successMessage("Pomyślnie usunięto wpis 🎉");
+			successMessage(t("deleteSuccess"));
 		})
 	} catch (err) {
 		console.error(err)
-		errorMessage("Nie udało się usunąć wpisu ❌");
+		errorMessage(t("deleteFail"));
 	}
 }
 
@@ -196,10 +199,10 @@ export const addBill = async (nextOrder: number) => {
 			name: '',
 			order: nextOrder
 			  });
-		successMessage("Pomyślnie utworzono wpis🎉");
+		successMessage(t("createSuccess"));
 	}	catch (err) {
 			console.error(err);
-			errorMessage("Nie udało się utworzyć wpisu ❌");
+			errorMessage(t("createFail"));
 	}
 }
 
@@ -259,14 +262,14 @@ export const setPaidBool = async (date: string, state: boolean) => {
 		const docSnap = await getDoc(docRef);
 		if (docSnap.exists()) {
 			await updateDoc(doc(db, uid+"Months", date), {paid: state});
-			successMessage("Pomyślnie zmieiono stan opłacenia 🎉");
+			successMessage(t("paidSuccess"));
 		} else {
 			await setDoc(doc(db, uid+"Months", date), {paid: state});
-			successMessage("Pomyślnie zmieiono stan opłacenia 🎉");
+			successMessage(t("paidSuccess"));
 		}
 	}	catch (err) {
 			console.error(err);
-			errorMessage("Nie udało się zmienić stanu opłacaenia ❌");
+			errorMessage(t("paidFail"));
 	}
 }
 
@@ -283,14 +286,14 @@ export const setMonthNote = async (date: string, entry: string) => {
 		const docSnap = await getDoc(docRef);
 		if (docSnap.exists()) {
 			await updateDoc(doc(db, uid+"Months", date), {note: entry});
-			successMessage("Pomyślnie zapisano notatkę 🎉");
+			successMessage(t("noteSuccess"));
 		} else {
 			await setDoc(doc(db, uid+"Months", date), {note: entry});
-			successMessage("Pomyślnie zapisano notatkę 🎉");
+			successMessage(t("noteSuccess"));
 		}
 	}	catch (err) {
 			console.error(err);
-			errorMessage("Nie udało się zapisać notatki ❌");
+			errorMessage(t("noteFail"));
 	}
 }
 
@@ -315,13 +318,13 @@ export const uploadFile = (file: File, date: string, id: string) => {
 			// https://firebase.google.com/docs/storage/web/handle-errors
 			switch (error.code) {
 			case 'storage/unauthorized':
-				errorMessage("Nie udało się przesłać faktury ❌ Rozmiar powinien być mniejszy od 3 MB");
+				errorMessage(t("uploadFailSize"));
 				break;
 			case 'storage/canceled':
-				errorMessage("Przesyłanie zostało anulowane ❌");
+				errorMessage(t("uploadFailCancel"));
 				break;
 			case 'storage/unknown':
-				errorMessage("Nie udało się przesłać faktury z powodu nieznanego błędu ❌");
+				errorMessage(t("uploadFail"));
 				break;
 			}
 		}, 
@@ -333,12 +336,12 @@ export const uploadFile = (file: File, date: string, id: string) => {
 				await updateDoc(billRef, {
 					file: true
 					});
-				successMessage("Pomyślnie zapisano notatkę 🎉");
+				successMessage(t("uploadSuccess"));
 			} else {
 				await setDoc(billRef, {
 					file: true
 					});
-				successMessage("Pomyślnie zapisano notatkę 🎉");
+				successMessage(t("uploadSuccess"));
 			}
 			}
 	);
@@ -376,7 +379,7 @@ export const downloadFile = (date:string, id:string, name:string) => {
 		})
     } catch (error) {
 		console.error(error);
-		errorMessage("Nie udało się pobrać faktury ❌");
+		errorMessage(t("downloadFail"));
     }
 }
 
@@ -395,10 +398,10 @@ export const deleteFile = (date: string, id: string) => {
 		await updateDoc(billRef, {
 			file: false
 			});
-		successMessage('Faktura usunięta 🎉');
+		successMessage(t("deleteFileSuccess"));
 	}).catch((error) => {
 		console.error(error);
-		errorMessage("Nie udało się usunąć faktury ❌");
+		errorMessage(t("deleteFileFail"));
 	});
 }
 
@@ -447,10 +450,10 @@ export const addMiscBill = async (nextOrder: number) => {
 			name: '',
 			order: nextOrder
 			  });
-		successMessage("Pomyślnie utworzono wpis🎉");
+		successMessage(t("createSuccess"));
 	}	catch (err) {
 			console.error(err);
-			errorMessage("Nie udało się utworzyć wpisu ❌");
+			errorMessage(t("createFail"));
 	}
 }
 
@@ -463,10 +466,10 @@ export const deleteMiscBill = async (id: string) => {
 	try {
 		const uid = getUid();
 		await deleteDoc(doc(db, uid+"Misc", id));
-		successMessage("Pomyślnie usunięto wpis🎉");
+		successMessage(t("deleteSuccess"));
 	} catch (err) {
 		console.error(err)
-		errorMessage("Nie udało się usunąć wpisu ❌");
+		errorMessage(t("deleteFail"));
 	}
 }
 
@@ -483,10 +486,10 @@ export const saveMiscBills = async (newBills: any) => {
 			delete reducedElement.id;	//dont want redundant id field in db
 			await setDoc(doc(db, uid+"Misc", element.id), reducedElement);
 		})
-		successMessage("Zmiany pomyślnie zapisane 🎉");
+		successMessage(t("saveSuccess"));
 	} catch(err) {
 		console.error(err);
-		errorMessage("Nie udało się zapisać zmian ❌");
+		errorMessage(t("saveFail"));
 	}
 }
 
@@ -536,12 +539,12 @@ export const LoginUser = (email: string, password: string, router: any) => {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             const user = userCredential.user;
-            successMessage("Zalogowano 🎉");
+            successMessage(t("loginSuccess"));
             router.push("/");
         })
         .catch((error) => {
             console.error(error);
-            errorMessage("Zły e-mail/hasło ❌");
+            errorMessage(t("loginFail"));
         });
 };
 
@@ -553,10 +556,10 @@ export const LoginUser = (email: string, password: string, router: any) => {
 export const LogOut = (router: any) => {
 	signOut(auth)
 		.then(() => {
-			successMessage("Wylogowano 🎉");
+			successMessage(t("logoutSuccess"));
 			router.push("/login");
 		})
 		.catch((error) => {
-			errorMessage("Nie udało się wylogować ❌");
+			errorMessage(t("logoutFail"));
 		});
 };

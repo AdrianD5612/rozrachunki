@@ -1,12 +1,13 @@
 import en from './locales/en.json';
 import pl from './locales/pl.json';
+import dynamic from 'next/dynamic'
 
 const translations = {
   en,
   pl,
 };
 
-const lang = navigator.language.slice(0, 2)==="pl" ? "pl" : "en"; // set polish or in any other case english
+let lang: "en" | "pl";
 
 /**
  * Get a translation for a given key in a specific locale.
@@ -17,6 +18,14 @@ const lang = navigator.language.slice(0, 2)==="pl" ? "pl" : "en"; // set polish 
  * @return {string} The translated value.
  */
 export function getTranslation(key: string): string {
+  if (lang == undefined) {
+    if (typeof window !== 'undefined' && navigator) {
+      // set polish or in any other case english
+      lang = navigator.language.slice(0, 2)==="pl" ? "pl" : "en";
+    } else {
+      lang = "en";
+    }
+  }
   if (!translations.hasOwnProperty(lang)) {
     throw new Error(`Unknown locale: ${lang}`);
   }

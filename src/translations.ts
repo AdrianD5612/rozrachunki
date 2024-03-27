@@ -1,6 +1,5 @@
 import en from './locales/en.json';
 import pl from './locales/pl.json';
-import dynamic from 'next/dynamic'
 
 const translations = {
   en,

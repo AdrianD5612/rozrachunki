@@ -3,7 +3,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, BillLite, getBillsToManage, saveBills, deleteBill, addBill, saveManagedBills, errorMessage, LogOut } from '@/utils';
 import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
-import { getTranslation } from '@/translations';
+import { getTranslation , switchLang} from '@/translations';
 
 
 export default function Home() {
@@ -28,7 +28,10 @@ export default function Home() {
     
           <div className=" from-black via-black items-center justify-center font-mono text-sm lg:flex">
             <button className="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => router.push("/")}>{t("mainPage")}</button>
-            <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={() => LogOut(router)}>{t("logOut")}</button>
+            <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={() => {
+              switchLang()
+              router.refresh()}}>{t("switchLang")}</button>
+            <button className="bg-red-500 hover:bg-red-600 active:bg-red-700 focus:outline-none focus:ring focus:ring-red-300 py-2 px-4 rounded-full" onClick={() => LogOut(router)}>{t("logOut")}</button>
           </div>
 
           <div className="max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm lg:flex">

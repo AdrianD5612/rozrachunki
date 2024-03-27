@@ -35,3 +35,11 @@ export function getTranslation(key: string): string {
   }
   return localeData[key];
 }
+
+export function switchLang() {
+  if (lang === "en") {
+    lang = "pl";
+  } else {
+    lang = "en";
+  }
+}

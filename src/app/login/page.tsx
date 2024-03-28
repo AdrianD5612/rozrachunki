@@ -13,7 +13,6 @@ export default function Home() {
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault()
     LoginUser(email, password, router)
-
   }
   
   return (
@@ -25,14 +24,14 @@ export default function Home() {
           className="border-[1px] py-2 px-4 rounded mb-4 text-black" required
           value={email}
           onChange={e => setEmail(e.target.value)} 
-          placeholder="admin@test.com"
+          placeholder="demo@user.com"
         />
         <label htmlFor="password">{t("password")}</label>
         <input type="password" name="password" id="password" required
           className="border-[1px] py-2 px-4 rounded  mb-4 text-black"
           value={password}
           onChange={e => setPassword(e.target.value)}
-          placeholder="admin123"
+          placeholder="demoUser"
         /> 
         <button type="submit" className="p-3 bg-blue-600 hover:bg-blue-800 text-white md:w-[200px] w-full rounded">{t("submitLogin")}</button>
       </form>

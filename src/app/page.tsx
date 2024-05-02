@@ -121,7 +121,7 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
           <p key={index}>{unpaid}</p>
         ))}
       </div>
-      <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm flex">
+      <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm md:text-base flex">
         <table className="text-white">
           <thead>
             <tr>
@@ -133,10 +133,10 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
           </thead>
           <tbody>
             {/* get all when it's bimonth or else get only non-bimonthly */}
-          {bills?.filter((entry:any) => (!filterNeeded || !entry.bimonthly)).map((bill: Bill, i) =>(
+          {bills?.filter((entry:any) => (!filterNeeded || !entry.bimonthly)).map((bill: Bill) =>(
             <tr key={bill.id}>
-            <td className='md:text-md text-sm'>{bill.name}</td>
-            <td className='md:text-md text-sm'>
+            <td className='text-sm md:text-base'>{bill.name}</td>
+            <td className='text-sm md:text-base'>
               {editMode ? (
                 <input
                   type="number"
@@ -155,7 +155,7 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
                 bill.day
               )}
               </td>
-              <td className='md:text-md text-sm'>
+              <td className='text-sm md:text-base'>
               {editMode? (
                 <input
                   type="number"

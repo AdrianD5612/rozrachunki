@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getChartData } from '@/utils';
 import { getTranslation} from '@/translations';
-import CanvasJSReact from '@canvasjs/react-charts';
+import ColumnChart from '@/components/columnChart';
 
 export default function Home() {
     const router = useRouter();
@@ -28,7 +28,7 @@ export default function Home() {
             <div className='items-center justify-center'>
                 {chartData?.map((entryData: any, index: number) => (
                     <div key={index}>
-                        <CanvasJSReact.CanvasJSChart options={{
+                        <ColumnChart options={{
                             title: { text: names[index] },
                             animationEnabled: true,
                             axisY:{

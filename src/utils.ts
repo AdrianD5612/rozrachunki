@@ -493,6 +493,45 @@ export const saveMiscBills = async (newBills: any) => {
 	}
 }
 
+export const getChartData = async (setChartData: any, setNames: any, setFinished: any) => {
+	try {
+		const uid = getUid();
+		const data: any = [];
+		const names: String[] = [];
+		const q = query(collection(db, uid+"Bills"));
+		const querySnapshot = await getDocs(q);
+		let collectionSize=querySnapshot.size;	//amount of all bills
+		var i=0;	//count of current data entry, skipping deleted ones
+		querySnapshot.forEach((async downloaded => {
+			if (!downloaded.data().deleted) {
+				names.push(downloaded.data().name);
+				data[data.length] = [];
+				const qq = query(collection(db, uid+"Bills", downloaded.id, 'amounts'));
+				const queryAmountsSnapshot = await getDocs(qq);
+				if (queryAmountsSnapshot.size > 0) {
+					queryAmountsSnapshot.forEach((async downloaded => {
+						if (downloaded.data().amount) {
+							data[i].push( { label: downloaded.id, y: downloaded.data().amount } );
+						}
+					}));
+				}
+				i++;
+			}
+			collectionSize--;
+			if (collectionSize === 0 ) {	//all bills have been fetched
+				setFinished(true);
+			}
+			}));
+		setChartData(data);
+		setNames(names);
+	} catch (err) {
+		console.error(err);
+		setChartData([]);
+		setNames([]);
+		setFinished(true);
+	}
+}
+
 /**
  * Displays a success message using the toast library.
  *

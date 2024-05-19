@@ -17,6 +17,7 @@ export interface User {
 export interface BillLite {
 	id: string;
 	bimonthly: boolean;
+	bimonthlyOdd: boolean;
 	fixedAmount: boolean;
 	fixedAmountV: number;
 	fixedDay: boolean;
@@ -78,7 +79,7 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 				bills.sort((a:any, b:any) => a.order - b.order);
 				setFinished(true);	//it is finished after fetching all "amounts" docs for every collection entry, without this table will be rendered incomplete
 			}
-			}));
+		}));
 		setBills(bills);
 	} catch (err) {
 		console.error(err)
@@ -192,6 +193,7 @@ export const addBill = async (nextOrder: number) => {
 		const uid = getUid();
 		const docRef = await addDoc(collection(db, uid+"Bills"), {
 			bimonthly: false,
+			bimonthlyOdd: false,
 			fixedAmount: false,
 			fixedAmountV: 0,
 			fixedDay: false,

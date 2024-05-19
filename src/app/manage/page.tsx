@@ -40,7 +40,7 @@ export default function Home() {
                 <tr>
                   <th>#</th>
                   <th>{t("name")}</th>
-                  <th>{t("frequency")}</th>
+                  <th>{t("bimonthly")}</th>
                   <th>{t("fixedD")}</th>
                   <th>{t("fixedA")}</th>
                   <th>{t("delete")}</th>
@@ -49,7 +49,7 @@ export default function Home() {
               <tbody>
               {bills?.map((bill: BillLite, i) =>(
                 <tr key={bill.id}>
-                <td className='md:text-md text-sm items-center justify-center'>
+                <td className='md:text-base text-sm items-center justify-center'>
                   <MdArrowUpward
                   className="text-white cursor-pointer"
                   onClick={() => {
@@ -85,7 +85,7 @@ export default function Home() {
                   }}
                   />
                 </td>
-                <td className='md:text-md text-sm'>
+                <td className='md:text-base text-sm'>
                   <input
                     type="string"
                     className='w-30 text-white bg-zinc-400/30'
@@ -100,7 +100,7 @@ export default function Home() {
                     }}
                   />
                 </td>
-                <td className='md:text-md text-sm'>
+                <td className='md:text-base text-sm'>
                   <input
                     id={bill.id}
                     type="checkbox"
@@ -115,9 +115,24 @@ export default function Home() {
                       );
                     }}
                   />
-                  <label htmlFor={bill.id}className="ms-1 text-sm font-medium text-gray-300">{t("bimonthly")}</label>
+                  <label htmlFor={bill.id}className="ms-1 text-sm font-medium text-gray-300">{t("even")}</label>
+                  <input
+                    id={bill.id+"odd"}
+                    type="checkbox"
+                    className={checkboxClass}
+                    checked={bill.bimonthlyOdd}
+                    onChange={(e) => {
+                      const newValue = e.target.checked;
+                      setBills((prevBills: any) =>
+                        prevBills.map((prevBill: BillLite) =>
+                          prevBill.id === bill.id ? { ...prevBill, bimonthlyOdd: newValue } : prevBill
+                        )
+                      );
+                    }}
+                  />
+                  <label htmlFor={bill.id+"odd"}className="ms-1 text-sm font-medium text-gray-300">{t("odd")}</label>
                 </td>
-                <td className='md:text-md text-sm'>
+                <td className='md:text-base text-sm'>
                   <input
                     type="checkbox"
                     className='w-16'
@@ -145,7 +160,7 @@ export default function Home() {
                     }}
                   />
                 </td>
-                <td className='md:text-md text-sm'>
+                <td className='md:text-base text-sm'>
                 <input
                   type="checkbox"
                   className='w-16'

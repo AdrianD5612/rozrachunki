@@ -40,7 +40,7 @@ export default function Home() {
     validatedBills=[];
     //validate if all fields are filled
     bills.forEach((element: Bill) => {
-      if (filterNeeded && element.bimonthly) {
+      if ((filterNeeded && element.bimonthly) || (!filterNeeded && element.bimonthlyOdd)) {
         } else {
         if (!element.amount) {
           if (element.fixedAmount) {
@@ -133,9 +133,9 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
             </tr>
           </thead>
           <tbody>
-            {/* get all when it's bimonth or else get only non-bimonthly */}
-          {bills?.filter((entry:any) => (!filterNeeded || !entry.bimonthly)).map((bill: Bill) =>(
-            <tr key={bill.id}>
+          {/* handle bimonthly and bimonthlyOdd filtering but still show if got data */}
+          {bills?.map((bill: Bill) =>(
+            <tr key={bill.id} style={{ display: bill.day ? 'table-row' : (((!filterNeeded || !bill.bimonthly) && (filterNeeded || !bill.bimonthlyOdd)) ? 'table-row' :  'none' )}}>
             <td className='text-sm md:text-base'>{bill.name}</td>
             <td className='text-sm md:text-base'>
               {editMode ? (

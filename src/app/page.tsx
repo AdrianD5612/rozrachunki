@@ -133,9 +133,9 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
             </tr>
           </thead>
           <tbody>
-          {/* handle bimonthly and bimonthlyOdd filtering but still show if got data */}
+          {/* handle row hiding with odds and evens: always show if got data, then show if correct odd/even and current month or edit mode */}
           {bills?.map((bill: Bill) =>(
-            <tr key={bill.id} style={{ display: bill.day ? 'table-row' : (((!filterNeeded || !bill.bimonthly) && (filterNeeded || !bill.bimonthlyOdd)) ? 'table-row' :  'none' )}}>
+            <tr key={bill.id} style={{ display: (!bill.bimonthly && !bill.bimonthlyOdd)? 'table-row' : (bill.day ? 'table-row' : (((!filterNeeded || !bill.bimonthly) && (filterNeeded || !bill.bimonthlyOdd) && (selectedDate.getMonth()+1 == new Date().getMonth()+1 || editMode)) ? 'table-row' :  'none' ))}}>
             <td className='text-sm md:text-base'>{bill.name}</td>
             <td className='text-sm md:text-base'>
               {editMode ? (

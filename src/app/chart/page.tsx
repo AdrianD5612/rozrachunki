@@ -31,9 +31,6 @@ export default function Home() {
                         <ColumnChart options={{
                             title: { text: names[index] },
                             animationEnabled: true,
-                            axisY:{
-                                interval: 20
-                            },
                             data: [
                                 {
                                   type: "column",

@@ -59,6 +59,12 @@ export default function Home() {
         if (!element.file) {
           element.file=false;
         }
+        if (!element.noteEnabled) {
+          element.noteEnabled=false;
+        }
+        if (!element.noteContent) {
+          element.noteContent='';
+        }
         validatedBills.push(element);
       }
     })
@@ -130,93 +136,118 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
               <th>{t("day")}</th>
               <th>{t("amount")}</th>
               <th>{t("file")}</th>
+              {editMode &&
+              <th>{t("note")}</th>
+              }
             </tr>
           </thead>
           <tbody>
           {/* handle row hiding with odds and evens: always show if got data, then show if correct odd/even and current month or edit mode */}
           {bills?.map((bill: Bill) =>(
-            <tr key={bill.id} style={{ display: (!bill.bimonthly && !bill.bimonthlyOdd)? 'table-row' : (bill.day ? 'table-row' : (((!filterNeeded || !bill.bimonthly) && (filterNeeded || !bill.bimonthlyOdd) && (selectedDate.getMonth()+1 == new Date().getMonth()+1 || editMode)) ? 'table-row' :  'none' ))}}>
-            <td className='text-sm md:text-base'>{bill.name}</td>
-            <td className='text-sm md:text-base'>
-              {editMode ? (
-                <input
-                  type="number"
-                  className={inputClass}
-                  value={bill.day ? (bill.day) : (bill.fixedDay? (bill.fixedDayV): '' )}
-                  onChange={(e) => {
-                    const newValue = parseInt(e.target.value);
-                    setBills((prevBills: any) =>
-                      prevBills.map((prevBill: Bill) =>
-                        prevBill.id === bill.id ? { ...prevBill, day: newValue } : prevBill
+            <><tr key={bill.id} style={{ display: (!bill.bimonthly && !bill.bimonthlyOdd) ? 'table-row' : (bill.day ? 'table-row' : (((!filterNeeded || !bill.bimonthly) && (filterNeeded || !bill.bimonthlyOdd) && (selectedDate.getMonth() + 1 == new Date().getMonth() + 1 || editMode)) ? 'table-row' : 'none')) }}>
+              <td className='text-sm md:text-base'>{bill.name}</td>
+              <td className='text-sm md:text-base'>
+                {editMode ? (
+                  <input
+                    type="number"
+                    className={inputClass}
+                    value={bill.day ? (bill.day) : (bill.fixedDay ? (bill.fixedDayV) : '')}
+                    onChange={(e) => {
+                      const newValue = parseInt(e.target.value);
+                      setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, day: newValue } : prevBill
                       )
-                    );
-                  }}
-                />
-              ) : (
-                bill.day
-              )}
+                      );
+                    } } />
+                ) : (
+                  bill.day
+                )}
               </td>
               <td className='text-sm md:text-base'>
-              {editMode? (
-                <input
-                  type="number"
-                  className={inputClass}
-                  value={bill.amount ? (bill.amount) : (bill.fixedAmount? (bill.fixedAmountV): '' )}
-                  onChange={(e) => {
-                    const newValue = parseFloat(e.target.value);
-                    setBills((prevBills: any) =>
-                      prevBills.map((prevBill: Bill) =>
-                        prevBill.id === bill.id ? { ...prevBill, amount: newValue } : prevBill
+                {editMode ? (
+                  <input
+                    type="number"
+                    className={inputClass}
+                    value={bill.amount ? (bill.amount) : (bill.fixedAmount ? (bill.fixedAmountV) : '')}
+                    onChange={(e) => {
+                      const newValue = parseFloat(e.target.value);
+                      setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, amount: newValue } : prevBill
                       )
-                    );
-                  }}
-                />
-              ) : (
-                bill.amount
-              )}
-            </td>
-            <td>
-              {editMode? (
-                (bill.file? (
-                  <MdDeleteForever
-                  className="text-3xl text-red-500 cursor-pointer"
-                  onClick={() => {
-                    deleteFile((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), bill.id);
-                    setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, file: false } : prevBill
+                      );
+                    } } />
+                ) : (
+                  bill.amount
+                )}
+              </td>
+              <td>
+                {editMode ? (
+                  (bill.file ? (
+                    <MdDeleteForever
+                      className="text-3xl text-red-500 cursor-pointer"
+                      onClick={() => {
+                        deleteFile((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), bill.id);
+                        setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, file: false } : prevBill
+                        )
+                        );
+                      } } />
+                  ) : (
+                    <input
+                      type="file"
+                      name="file"
+                      className="block w-full mb-5 text-xs border rounded-lg cursor-pointer text-gray-400 focus:outline-none bg-gray-700 border-gray-600 placeholder-gray-400"
+                      onChange={(e) => {
+                        prepareUploadFile(e.target.files?.[0], bill.id);
+                        setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, file: true } : prevBill
+                        )
+                        );
+                      } } />
+                  ))
+                ) : (
+                  (bill.file ? (
+                    <MdFolderOpen
+                      className="text-3xl text-green-500 cursor-pointer"
+                      onClick={() => {
+                        downloadFile((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), bill.id, bill.name);
+                      } } />
+                  ) : (
+                    <p></p>
+                  )
+                  )
+                )}
+              </td>
+              {editMode &&
+              <td>
+              <input
+              type="checkbox"
+              className='w-16'
+              checked={bill.noteEnabled}
+              onChange={(e) => {
+                const newValue = e.target.checked;
+                setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, noteEnabled: newValue } : prevBill )
+                )
+              } }
+              />
+              </td>
+            }
+            </tr>
+            <tr key={bill.id} className='text-sm md:text-base' style={{ display: !bill.noteEnabled ? 'none' : ((!bill.bimonthly && !bill.bimonthlyOdd) ? 'table-row' : (bill.day ? 'table-row' : (((!filterNeeded || !bill.bimonthly) && (filterNeeded || !bill.bimonthlyOdd) && (selectedDate.getMonth() + 1 == new Date().getMonth() + 1 || editMode)) ? 'table-row' : 'none')) ) }}>
+              <td colSpan={4}>
+              {editMode ? (
+                <input
+                  type="text"
+                  className={inputClass+' w-full'}
+                  value={bill.noteContent}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, noteContent: newValue } : prevBill
                     )
                     );
                   } } />
-                ) : (
-                  <input
-                  type="file"
-                  name="file"
-                  className="block w-full mb-5 text-xs border rounded-lg cursor-pointer text-gray-400 focus:outline-none bg-gray-700 border-gray-600 placeholder-gray-400"
-                  onChange={(e) => {
-                    prepareUploadFile(e.target.files?.[0], bill.id);
-                    setBills((prevBills: any) =>
-                      prevBills.map((prevBill: Bill) =>
-                        prevBill.id === bill.id ? { ...prevBill, file: true } : prevBill
-                      )
-                    );
-                  }}
-                  />
-                ) )
               ) : (
-                (bill.file? (
-                  <MdFolderOpen 
-                    className="text-3xl text-green-500 cursor-pointer"
-                    onClick={() => {
-                      downloadFile((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), bill.id, bill.name);
-                    }}
-                  />
-                ) : (
-                  <p></p>
-                )
-              )
-              )
-              }
-            </td>
+                <p>{bill.noteContent}</p>
+              )}
+              </td>
             </tr>
+            </>
             ))} 
           </tbody>
         </table>

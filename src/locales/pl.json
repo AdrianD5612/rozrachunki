@@ -8,6 +8,7 @@
     "day": "Termin",
     "amount": "Kwota",
     "file": "Faktura",
+    "note": "Notatka",
     "saveChanges": "Zapisz zmiany",
     "saveNote": "Zapisz notatkę",
     "monthIsPaid": "Wybrany miesiąc został już oznaczony jako opłacony 🎉",

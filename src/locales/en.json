@@ -8,6 +8,7 @@
     "day": "Day",
     "amount": "Amount",
     "file": "Invoice",
+    "note": "Note",
     "saveChanges": "Save changes",
     "saveNote": "Save note",
     "monthIsPaid": "Selected month has already been marked as paid 🎉",

@@ -30,6 +30,8 @@ export interface Bill extends BillLite {
 	amount: number;
 	day: number;
 	file: boolean;
+	noteEnabled: boolean;
+	noteContent: string;
 }
 
 export interface MiscBill {
@@ -97,7 +99,7 @@ export const saveBills = async (date: string, newBills: Bill[]) => {
 	try {
 		const uid = getUid();
 		newBills.forEach(async (element) => {
-			await setDoc(doc(db, uid+"Bills", element.id, 'amounts', date), {amount: element.amount, day: element.day, file: element.file});
+			await setDoc(doc(db, uid+"Bills", element.id, 'amounts', date), {amount: element.amount, day: element.day, file: element.file, noteEnabled: element.noteEnabled , noteContent: element.noteContent});
 		})
 		//creating blank month data too if not yet exists so unpaid scanning can detect it
 		const docRef = doc(db, uid+'Months', date);

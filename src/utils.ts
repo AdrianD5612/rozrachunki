@@ -312,10 +312,17 @@ export const uploadFile = (file: File, date: string, id: string) => {
 	const uid = getUid();
 	const storage = getStorage();
 	const storageRef = ref(storage, uid+'/'+date+'/'+id+'.pdf');
+	let toastId : any = null;
 	const uploadTask = uploadBytesResumable(storageRef, file);
 	uploadTask.on('state_changed',
 		(snapshot) => {
 			// Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+			const progress = Math.round( (snapshot.bytesTransferred / snapshot.totalBytes) * 100 ) / 100;
+			if (toastId === null) {
+				toastId = toast(t("uploading"), { progress, theme: "dark" });
+			  } else {
+				toast.update(toastId, { progress });
+			  } 
 		}, 
 		(error) => {
 			// A full list of error codes is available at
@@ -334,6 +341,7 @@ export const uploadFile = (file: File, date: string, id: string) => {
 		}, 
 		async () => {
 			// success
+			toast.done(toastId);
 			const billRef = doc(db, uid+"Bills", id, 'amounts', date);
 			const docSnap = await getDoc(billRef);
 			if (docSnap.exists()) {

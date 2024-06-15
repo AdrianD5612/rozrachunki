@@ -47,6 +47,7 @@
     "paidFail": "Failed to change payment status ❌",
     "noteSuccess": "Successfully saved note 🎉",
     "noteFail": "Failed to save note ❌",
+    "uploading": "Uploading...",
     "uploadFailSize": "Failed to upload invoice ❌ File size should be smaller than 3 MB",
     "uploadFailCancel": "Upload canceled ❌",
     "uploadFail": "Failed to upload invoice due to unknown error ❌",

@@ -47,6 +47,7 @@
     "paidFail": "Nie udało się zmienić stanu opłacaenia ❌",
     "noteSuccess": "Pomyślnie zapisano notatkę 🎉",
     "noteFail": "Nie udało się zapisać notatki ❌",
+    "uploading": "Wysyłanie...",
     "uploadFailSize": "Nie udało się przesłać faktury ❌ Rozmiar powinien być mniejszy od 3 MB",
     "uploadFailCancel": "Przesyłanie zostało anulowane ❌",
     "uploadFail": "Nie udało się przesłać faktury z powodu nieznanego błędu ❌",

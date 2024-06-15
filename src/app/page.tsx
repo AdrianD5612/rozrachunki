@@ -144,7 +144,8 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
           <tbody>
           {/* handle row hiding with odds and evens: always show if got data, then show if correct odd/even and current month or edit mode */}
           {bills?.map((bill: Bill) =>(
-            <><tr key={bill.id} style={{ display: (!bill.bimonthly && !bill.bimonthlyOdd) ? 'table-row' : (bill.day ? 'table-row' : (((!filterNeeded || !bill.bimonthly) && (filterNeeded || !bill.bimonthlyOdd) && (selectedDate.getMonth() + 1 == new Date().getMonth() + 1 || editMode)) ? 'table-row' : 'none')) }}>
+            <React.Fragment key={bill.id+'Frag'}>
+            <tr key={bill.id} style={{ display: (!bill.bimonthly && !bill.bimonthlyOdd) ? 'table-row' : (bill.day ? 'table-row' : (((!filterNeeded || !bill.bimonthly) && (filterNeeded || !bill.bimonthlyOdd) && (selectedDate.getMonth() + 1 == new Date().getMonth() + 1 || editMode)) ? 'table-row' : 'none')) }}>
               <td className='text-sm md:text-base'>{bill.name}</td>
               <td className='text-sm md:text-base'>
                 {editMode ? (
@@ -215,39 +216,37 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
                 )}
               </td>
               {editMode &&
-              <td>
-              <input
-              type="checkbox"
-              className='w-16'
-              checked={bill.noteEnabled}
-              onChange={(e) => {
-                const newValue = e.target.checked;
-                setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, noteEnabled: newValue } : prevBill )
-                )
-              } }
-              />
-              </td>
-            }
+                <td>
+                  <input
+                    type="checkbox"
+                    className='w-16'
+                    checked={bill.noteEnabled}
+                    onChange={(e) => {
+                      const newValue = e.target.checked;
+                      setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, noteEnabled: newValue } : prevBill)
+                      );
+                    } } />
+                </td>}
             </tr>
-            <tr key={bill.id} className='text-sm md:text-base' style={{ display: !bill.noteEnabled ? 'none' : ((!bill.bimonthly && !bill.bimonthlyOdd) ? 'table-row' : (bill.day ? 'table-row' : (((!filterNeeded || !bill.bimonthly) && (filterNeeded || !bill.bimonthlyOdd) && (selectedDate.getMonth() + 1 == new Date().getMonth() + 1 || editMode)) ? 'table-row' : 'none')) ) }}>
-              <td colSpan={4}>
-              {editMode ? (
-                <input
-                  type="text"
-                  className={inputClass+' w-full'}
-                  value={bill.noteContent}
-                  onChange={(e) => {
-                    const newValue = e.target.value;
-                    setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, noteContent: newValue } : prevBill
-                    )
-                    );
-                  } } />
-              ) : (
-                <p>{bill.noteContent}</p>
-              )}
-              </td>
-            </tr>
-            </>
+            <tr key={bill.id + 'Note'} className='text-sm md:text-base' style={{ display: !bill.noteEnabled ? 'none' : ((!bill.bimonthly && !bill.bimonthlyOdd) ? 'table-row' : (bill.day ? 'table-row' : (((!filterNeeded || !bill.bimonthly) && (filterNeeded || !bill.bimonthlyOdd) && (selectedDate.getMonth() + 1 == new Date().getMonth() + 1 || editMode)) ? 'table-row' : 'none'))) }}>
+                <td colSpan={4}>
+                  {editMode ? (
+                    <input
+                      type="text"
+                      className={inputClass + ' w-full'}
+                      value={bill.noteContent}
+                      onChange={(e) => {
+                        const newValue = e.target.value;
+                        setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, noteContent: newValue } : prevBill
+                        )
+                        );
+                      } } />
+                  ) : (
+                    <p>{bill.noteContent}</p>
+                  )}
+                </td>
+              </tr>
+              </React.Fragment>
             ))} 
           </tbody>
         </table>

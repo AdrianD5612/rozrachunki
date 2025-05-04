@@ -7,11 +7,19 @@ import db from "./firebase";
 import axios from 'axios';
 import { getTranslation } from "./translations";
 
+const firstYear = 2024;
 const t = (key: string) => getTranslation(key);
 
 export interface User {
     email: string | null,
     uid: string | null
+}
+
+export interface Month {
+	id: number;
+	paid: boolean;
+	note: string;
+	total: number;
 }
 
 export interface BillLite {
@@ -209,6 +217,17 @@ export const addBill = async (nextOrder: number) => {
 			errorMessage(t("createFail"));
 	}
 }
+
+export const getYears = async (setYears: any) => {
+	const currentYear = new Date().getFullYear();
+	const years : number[] = [];
+	//adding next year too
+	for (let i = firstYear; i <= currentYear+1; i++) {
+		years.push(i);
+	}
+	setYears(years);
+}
+
 
 /**
  * Asynchronously retrieves data for a specific month and sets the 'paid' and 'note' state variables accordingly.

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@canvasjs/react-charts": "^1.0.2",
+    "@headlessui/react": "^2.0.4",
     "axios": "^1.6.7",
     "firebase": "^10.8.0",
     "next": "^14.1.0",

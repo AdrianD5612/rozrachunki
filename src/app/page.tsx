@@ -3,26 +3,33 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase';
 import { onAuthStateChanged } from "firebase/auth";
-import { User, Bill, getBills, saveBills, getMonthData, setPaidBool, setMonthNote, uploadFile, deleteFile, downloadFile } from '@/utils';
-import { TuiDateMonthPicker } from 'nextjs-tui-date-picker';
+import { User, Bill, getBills, saveBills, getYears, getMonthData, setPaidBool, setMonthNote, uploadFile, deleteFile, downloadFile } from '@/utils';
 import { MdDeleteForever, MdFolderOpen } from "react-icons/md";
 import { getTranslation } from '@/translations';
+import SelectMenu from '@/components/SelectMenu';
 
 
 export default function Home() {
   const inputClass = "w-16 text-white bg-zinc-400/30";
   const router = useRouter();
+  const [years, setYears] = useState<number[]>([1970]);
   const [bills, setBills] = useState<Bill[] | []>([]);
   const [editMode, setEditMode] = useState(false);
   const [finished, setFinished] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(new Date(Date.now()).getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date(Date.now()).getFullYear());
   const [selectedDate, setSelectedDate] = useState(new Date(Date.now()));
   const [filterNeeded, setFilterNeeded] = useState(Boolean);
   const [paid, setPaid] = useState(true);
   const [note, setNote] = useState(String);
   const [unpaidList, setUnpaidList] = useState<String[] | []>([]);
-  const dateChanged = (value: string) => {
-    setSelectedDate(new Date(value));
-    fetchNewDate(new Date(value));
+  const dateChanged = () => {
+    setSelectedDate(new Date(selectedYear, selectedMonth-1, 1));
+    fetchNewDate(new Date(selectedYear, selectedMonth-1, 1));
+  }
+
+  const fetchYears = async () => {
+    getYears(setYears);
   }
   const fetchNewDate = async (givenDate: Date) => {
     setFinished(false);
@@ -87,7 +94,7 @@ export default function Home() {
 		onAuthStateChanged(auth, async (user) => {
             if (user) {
                 setUser({ email: user.email, uid: user.uid });
-                fetchNewDate(selectedDate);
+                fetchYears().then(() => fetchNewDate(selectedDate));
 			} else {
 				return router.push("/login");
 			}
@@ -107,14 +114,11 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
         <button className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 focus:outline-none focus:ring focus:ring-orange-300 py-2 px-4 rounded-full" onClick={() => router.push("/chart")}>{t("charts")}</button>
         <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={() => router.push("/misc")}>{t("misc")}</button>
       </div>
-      <div className="z-10 w-0 from-black via-black items-center justify-end lg:justify-center font-sans text-sm flex">
+      <div className="z-10 w-0 from-black via-black items-center justify-center font-sans text-sm flex">
         <>
-          <TuiDateMonthPicker
-            handleChange={dateChanged}
-            date={selectedDate}
-            inputWidth={140}
-            fontSize={16}
-          />
+          <SelectMenu entries={years} selected={selectedYear} setSelected={setSelectedYear} />
+          <SelectMenu entries={[1,2,3,4,5,6,7,8,9,10,11,12]}selected={selectedMonth} setSelected={setSelectedMonth}/>
+          <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={dateChanged}>GO</button>
         </>
         <input type="checkbox" id="editing" name="editing" checked={editMode} onChange={() => setEditMode(!editMode)}></input>
         <label htmlFor="editing">{t("editMode")}</label><br></br>

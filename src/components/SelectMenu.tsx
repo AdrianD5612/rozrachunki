@@ -10,7 +10,7 @@ export default function Example({entries, selected, setSelected, dateChanged} : 
   return (
     <Listbox value={selected} onChange={(value) => {
         setSelected(value);
-        dateChanged();
+        dateChanged(value);
       }}>
       {({ open }) => (
         <>

@@ -23,9 +23,15 @@ export default function Home() {
   const [paid, setPaid] = useState(true);
   const [note, setNote] = useState(String);
   const [unpaidList, setUnpaidList] = useState<String[] | []>([]);
-  const dateChanged = () => {
-    setSelectedDate(new Date(selectedYear, selectedMonth-1, 1));
-    fetchNewDate(new Date(selectedYear, selectedMonth-1, 1));
+  const dateChanged = (selected: number) => {
+    if (selected > 12) {
+      setSelectedDate(new Date(selected, selectedMonth-1, 1));
+    fetchNewDate(new Date(selected, selectedMonth-1, 1));
+    }
+    else {
+    setSelectedDate(new Date(selectedYear, selected-1, 1));
+    fetchNewDate(new Date(selectedYear, selected-1, 1));
+    }
   }
 
   const fetchYears = async () => {
@@ -118,7 +124,6 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
         <>
           <SelectMenu entries={years} selected={selectedYear} setSelected={setSelectedYear} dateChanged={dateChanged} />
           <SelectMenu entries={[1,2,3,4,5,6,7,8,9,10,11,12]}selected={selectedMonth} setSelected={setSelectedMonth} dateChanged={dateChanged}/>
-          <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={dateChanged}>GO</button>
         </>
         <input type="checkbox" id="editing" name="editing" checked={editMode} onChange={() => setEditMode(!editMode)}></input>
         <label htmlFor="editing">{t("editMode")}</label><br></br>

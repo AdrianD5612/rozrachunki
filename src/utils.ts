@@ -15,13 +15,6 @@ export interface User {
     uid: string | null
 }
 
-export interface Month {
-	id: number;
-	paid: boolean;
-	note: string;
-	total: number;
-}
-
 export interface BillLite {
 	id: string;
 	bimonthly: boolean;

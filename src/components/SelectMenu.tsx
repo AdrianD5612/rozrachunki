@@ -5,10 +5,13 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Example({entries, selected, setSelected} : {entries: number[], selected: number, setSelected: any}) {
+export default function Example({entries, selected, setSelected, dateChanged} : {entries: number[], selected: number, setSelected: any, dateChanged: any}) {
 
   return (
-    <Listbox value={selected} onChange={ (value) => {setSelected(value) }}>
+    <Listbox value={selected} onChange={(value) => {
+        setSelected(value);
+        dateChanged();
+      }}>
       {({ open }) => (
         <>
           <div className="relative mt-2">

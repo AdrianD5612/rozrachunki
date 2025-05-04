@@ -116,8 +116,8 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
       </div>
       <div className="z-10 w-0 from-black via-black items-center justify-center font-sans text-sm flex">
         <>
-          <SelectMenu entries={years} selected={selectedYear} setSelected={setSelectedYear} />
-          <SelectMenu entries={[1,2,3,4,5,6,7,8,9,10,11,12]}selected={selectedMonth} setSelected={setSelectedMonth}/>
+          <SelectMenu entries={years} selected={selectedYear} setSelected={setSelectedYear} dateChanged={dateChanged} />
+          <SelectMenu entries={[1,2,3,4,5,6,7,8,9,10,11,12]}selected={selectedMonth} setSelected={setSelectedMonth} dateChanged={dateChanged}/>
           <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={dateChanged}>GO</button>
         </>
         <input type="checkbox" id="editing" name="editing" checked={editMode} onChange={() => setEditMode(!editMode)}></input>

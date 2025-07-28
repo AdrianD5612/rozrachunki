@@ -176,7 +176,7 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
                 {editMode ? (
                   <input
                     type="number"
-                    className={inputClass}
+                    className={inputClass+' w-20'}
                     value={bill.amount ? (bill.amount) : (bill.fixedAmount ? (bill.fixedAmountV) : '')}
                     onChange={(e) => {
                       const newValue = parseFloat(e.target.value);

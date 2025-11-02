@@ -3,10 +3,16 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase';
 import { onAuthStateChanged } from "firebase/auth";
-import { User, Bill, getBills, saveBills, getYears, getMonthData, setPaidBool, setMonthNote, uploadFile, deleteFile, downloadFile } from '@/utils';
-import { MdDeleteForever, MdFolderOpen } from "react-icons/md";
+import { User, Bill, getBills, saveBills, getYears, getMonthData, setPaidBool, setMonthNote, uploadFile } from '@/utils';
 import { getTranslation } from '@/translations';
-import SelectMenu from '@/components/SelectMenu';
+import NavButtons from '@/components/NavButtons';
+import DateControls from '@/components/DateControls';
+import UnpaidBanner from '@/components/UnpaidBanner';
+import BillsTable from '@/components/BillsTable';
+import SaveChangesBar from '@/components/SaveChangesBar';
+import MonthNoteEditor from '@/components/MonthNoteEditor';
+import MonthNoteDisplay from '@/components/MonthNoteDisplay';
+import PaidStatusBar from '@/components/PaidStatusBar';
 
 
 export default function Home() {
@@ -115,190 +121,53 @@ export default function Home() {
 if (!finished) return  <div className="flex justify-center border-b border-neutral-800 bg-gradient-to-b from-zinc-600/30 pb-6 pt-8 backdrop-blur-2xl lg:static lg:w-auto lg:rounded-xl lg:p-4">...</div>
   return (
     <main className="flex flex-col items-center justify-center p-24 border-neutral-800 bg-zinc-800/30 from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:p-4">
-      <div className="z-10 w-0 from-black via-black items-center justify-center font-mono text-sm flex">
-        <button className="bg-violet-500 hover:bg-violet-600 active:bg-violet-700 focus:outline-none focus:ring focus:ring-violet-300 py-2 px-4 rounded-full" onClick={() => router.push("/manage")}>{t("manage")}</button>
-        <button className="bg-orange-500 hover:bg-orange-600 active:bg-orange-700 focus:outline-none focus:ring focus:ring-orange-300 py-2 px-4 rounded-full" onClick={() => router.push("/chart")}>{t("charts")}</button>
-        <button className="bg-lime-500 hover:bg-lime-600 active:bg-lime-700 focus:outline-none focus:ring focus:ring-lime-300 py-2 px-4 rounded-full" onClick={() => router.push("/misc")}>{t("misc")}</button>
-      </div>
-      <div className="z-10 w-0 from-black via-black items-center justify-center font-sans text-sm flex">
-        <>
-          <SelectMenu entries={years} selected={selectedYear} setSelected={setSelectedYear} dateChanged={dateChanged} />
-          <SelectMenu entries={[1,2,3,4,5,6,7,8,9,10,11,12]}selected={selectedMonth} setSelected={setSelectedMonth} dateChanged={dateChanged}/>
-        </>
-        <input type="checkbox" id="editing" name="editing" checked={editMode} onChange={() => setEditMode(!editMode)}></input>
-        <label htmlFor="editing">{t("editMode")}</label><br></br>
-      </div>
-      <div className="mt-2 items-center justify-center flex text-red-500" style={{
-        //show only if there is at least one unpaid month
-        display: unpaidList.length>0 ? "block": "none"
-      }}>
-        <p>{t("unpaidMonths")}:</p>
-        {unpaidList.map((unpaid: String, index: number) => (
-          <p key={index}>{unpaid}</p>
-        ))}
-      </div>
-      <div className="-z-5 max-w-5xl w-full from-black via-black items-center justify-center font-mono text-sm md:text-base flex">
-        <table className="text-white">
-          <thead>
-            <tr>
-              <th>{t("name")}</th>
-              <th>{t("day")}</th>
-              <th>{t("amount")}</th>
-              <th>{t("file")}</th>
-              {editMode &&
-              <th>{t("note")}</th>
-              }
-            </tr>
-          </thead>
-          <tbody>
-          {/* handle row hiding with odds and evens: always show if got data, then show if correct odd/even and current month or edit mode */}
-          {bills?.map((bill: Bill) =>(
-            <React.Fragment key={bill.id+'Frag'}>
-            <tr key={bill.id} style={{ display: (!bill.bimonthly && !bill.bimonthlyOdd) ? 'table-row' : (bill.day ? 'table-row' : (((!filterNeeded || !bill.bimonthly) && (filterNeeded || !bill.bimonthlyOdd) && (selectedDate.getMonth() + 1 == new Date().getMonth() + 1 || editMode)) ? 'table-row' : 'none')) }}>
-              <td className='text-sm md:text-base'>{bill.name}</td>
-              <td className='text-sm md:text-base'>
-                {editMode ? (
-                  <input
-                    type="number"
-                    className={inputClass}
-                    value={bill.day ? (bill.day) : (bill.fixedDay ? (bill.fixedDayV) : '')}
-                    onChange={(e) => {
-                      const newValue = parseInt(e.target.value);
-                      setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, day: newValue } : prevBill
-                      )
-                      );
-                    } } />
-                ) : (
-                  bill.day
-                )}
-              </td>
-              <td className='text-sm md:text-base'>
-                {editMode ? (
-                  <input
-                    type="number"
-                    className={inputClass+' w-20'}
-                    value={bill.amount ? (bill.amount) : (bill.fixedAmount ? (bill.fixedAmountV) : '')}
-                    onChange={(e) => {
-                      const newValue = parseFloat(e.target.value);
-                      setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, amount: newValue } : prevBill
-                      )
-                      );
-                    } } />
-                ) : (
-                  bill.amount
-                )}
-              </td>
-              <td>
-                {editMode ? (
-                  (bill.file ? (
-                    <MdDeleteForever
-                      className="text-3xl text-red-500 cursor-pointer"
-                      onClick={() => {
-                        deleteFile((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), bill.id);
-                        setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, file: false } : prevBill
-                        )
-                        );
-                      } } />
-                  ) : (
-                    <input
-                      type="file"
-                      name="file"
-                      className="block w-full mb-5 text-xs border rounded-lg cursor-pointer text-gray-400 focus:outline-none bg-gray-700 border-gray-600 placeholder-gray-400"
-                      onChange={(e) => {
-                        prepareUploadFile(e.target.files?.[0], bill.id);
-                        setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, file: true } : prevBill
-                        )
-                        );
-                      } } />
-                  ))
-                ) : (
-                  (bill.file ? (
-                    <MdFolderOpen
-                      className="text-3xl text-green-500 cursor-pointer"
-                      onClick={() => {
-                        downloadFile((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), bill.id, bill.name);
-                      } } />
-                  ) : (
-                    <p></p>
-                  )
-                  )
-                )}
-              </td>
-              {editMode &&
-                <td>
-                  <input
-                    type="checkbox"
-                    className='w-16'
-                    checked={bill.noteEnabled}
-                    onChange={(e) => {
-                      const newValue = e.target.checked;
-                      setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, noteEnabled: newValue } : prevBill)
-                      );
-                    } } />
-                </td>}
-            </tr>
-            <tr key={bill.id + 'Note'} className='text-sm md:text-base' style={{ display: !bill.noteEnabled ? 'none' : ((!bill.bimonthly && !bill.bimonthlyOdd) ? 'table-row' : (bill.day ? 'table-row' : (((!filterNeeded || !bill.bimonthly) && (filterNeeded || !bill.bimonthlyOdd) && (selectedDate.getMonth() + 1 == new Date().getMonth() + 1 || editMode)) ? 'table-row' : 'none'))) }}>
-                <td colSpan={4}>
-                  {editMode ? (
-                    <input
-                      type="text"
-                      className={inputClass + ' w-full'}
-                      value={bill.noteContent}
-                      onChange={(e) => {
-                        const newValue = e.target.value;
-                        setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, noteContent: newValue } : prevBill
-                        )
-                        );
-                      } } />
-                  ) : (
-                    <p>{bill.noteContent}</p>
-                  )}
-                </td>
-              </tr>
-              </React.Fragment>
-            ))} 
-          </tbody>
-        </table>
-      </div>
-      <div className="mt-2 items-center justify-center flex" style={{
-        display: editMode? "block":"none"
-      }}>
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => uploadBills()}>{t("saveChanges")}</button>
-      </div>
-      <div className="mt-2 items-center justify-end flex" style={{
-        display: editMode? "block":"none"
-      }}>
-          <div>
-            <input
-              type="text"
-              id="noteInput"
-              name="noteInput"
-              className={inputClass+' w-auto'}
-              value={note}
-              onChange={(e) => {setNote(e.target.value)}}
-            />
-          </div>
-          <div className="mt-2 items-center justify-center flex">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => setMonthNote((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), note)}>{t("saveNote")}</button>
-          </div>
-      </div>
-      <div className="mt-2 items-center justify-center flex" style={{
-        // display label when not editing and note exists
-        display: editMode? "none": (note==''? "none" : "block")
-      }}>
-        {note}
-      </div>
-      <div className="mt-2 items-center justify-center flex">
-      {paid? (
-        <><p className={`m-0 max-w-[30ch] opacity-80 text-emerald-500`}>
-            {t("monthIsPaid")}
-          </p><button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onClick={() => uploadPaid(false)}>{t("change")}</button></>
-      ) : (
-        <><p className={`m-0 max-w-[30ch] opacity-80 text-rose-500`}>
-            {t("monthIsNotPaid")}
-          </p><button className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded" onClick={() => uploadPaid(true)}>{t("change")}</button></>
-      )}
-      </div>
+      <NavButtons
+        t={t}
+        onManage={() => router.push("/manage")}
+        onChart={() => router.push("/chart")}
+        onMisc={() => router.push("/misc")}
+      />
+
+      <DateControls
+        t={t}
+        years={years}
+        selectedYear={selectedYear}
+        setSelectedYear={setSelectedYear}
+        selectedMonth={selectedMonth}
+        setSelectedMonth={setSelectedMonth}
+        dateChanged={dateChanged}
+        editMode={editMode}
+        toggleEditMode={() => setEditMode(!editMode)}
+      />
+
+      <UnpaidBanner t={t} unpaidList={unpaidList} />
+
+      <BillsTable
+        t={t}
+        bills={bills as Bill[]}
+        editMode={editMode}
+        filterNeeded={filterNeeded as any}
+        selectedDate={selectedDate}
+        inputClass={inputClass}
+        setBills={setBills}
+        prepareUploadFile={prepareUploadFile}
+      />
+
+      <SaveChangesBar t={t} editMode={editMode} onSave={() => uploadBills()} />
+
+      <MonthNoteEditor
+        t={t}
+        editMode={editMode}
+        note={note as any}
+        setNote={(v: any) => setNote(v)}
+        onSaveNote={() => setMonthNote((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), note as any)}
+        inputClass={inputClass}
+      />
+
+      <MonthNoteDisplay editMode={editMode} note={note as any} />
+
+      <PaidStatusBar t={t} paid={paid} onChangePaid={uploadPaid} />
     </main>
   );
 }
+

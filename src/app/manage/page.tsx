@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { User, BillLite, getBillsToManage, saveBills, deleteBill, addBill, saveManagedBills, errorMessage, LogOut } from '@/utils';
 import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
 import { getTranslation , switchLang} from '@/translations';
-
+import { Settings, getSettings, saveSettings } from '@/utils';
 
 export default function Home() {
     const checkboxClass="text-blue-600 rounded focus:ring-blue-600 ring-offset-gray-800 bg-gray-700 border-gray-600";
@@ -13,12 +13,16 @@ export default function Home() {
     const router = useRouter();
     const [finished, setFinished] = useState(false);
     const [bills, setBills] = useState<BillLite[] | []>([]);
+    const [settings, setSettings] = useState<Settings>({ unpaids: true });
     const t = (key: string) => getTranslation(key);
 
     useEffect(() => {
       let ignore = false;
       
-      if (!ignore)  getBillsToManage(setBills, setFinished)
+      if (!ignore)  {
+        getBillsToManage(setBills, setFinished);
+        getSettings(setSettings);
+      }
       return () => { ignore = true; }
       },[]);
 
@@ -208,6 +212,21 @@ export default function Home() {
           </div>
           <div>
             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => saveManagedBills(bills)}>{t("saveChanges")}</button>
+          </div>
+          <div className="text-white border border-neutral-800 rounded-lg p-4 bg-zinc-700/30">
+              <div className="mb-2 text-sm items-center justify-center flex tracking-wide text-gray-300">{t("settings")}</div>
+              <input
+                id="settings-unpaids"
+                type="checkbox"
+                className={checkboxClass}
+                checked={settings.unpaids}
+                onChange={(e) => {
+                  const newSettings: Settings = { ...settings, unpaids: e.target.checked };
+                  setSettings(newSettings);
+                  saveSettings(newSettings);
+                }}
+              />
+              <label htmlFor="settings-unpaids" className="text-sm font-medium text-gray-200">{t("unpaidsVisibility")}</label>
           </div>
         </main>
     )

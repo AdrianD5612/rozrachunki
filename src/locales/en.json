@@ -33,6 +33,8 @@
     "even": "Even",
     "confirmDelete": "Are you sure you want to delete this entry along with its history?",
     "createNew": "Create new",
+    "settings": "Settings",
+    "unpaidsVisibility": "Show list of unpaid months",
 
     "active": "Active",
     "confirmDeleteMisc": "Are you sure you want to delete this entry?",

@@ -43,6 +43,10 @@ export interface MiscBill {
 	order: number;
 }
 
+export interface Settings {
+	unpaids: boolean;
+}
+
 function getUid() {
 	return auth.currentUser? auth.currentUser.uid : 'error';
 }
@@ -229,7 +233,7 @@ export const getYears = async (setYears: any) => {
  * @param {any} setPaid - function to set the 'paid' state variable
  * @param {any} setNote - function to set the 'note' state variable
  */
-export const getMonthData = async (date: string, setPaid: any, setNote: any, setUnpaidMonths: any) => {
+export const getMonthData = async (date: string, setPaid: any, setNote: any, unpaids: boolean, setUnpaidMonths: any) => {
 	try {
 		const uid = getUid();
 		const docRef = doc(db, uid+'Months', date);
@@ -241,25 +245,28 @@ export const getMonthData = async (date: string, setPaid: any, setNote: any, set
 			setPaid(false);
 			setNote('');
 		}
-		const q = query(collection(db, uid+"Months"));
-		const querySnapshot = await getDocs(q);
 		const unpaidMonths: string[] = [];
-		let collectionSize=querySnapshot.size;
-		const currentDate = new Date();
-		const currentMonth = currentDate.getMonth() + 1;
-		const currentYear = currentDate.getFullYear();
-		querySnapshot.forEach((async downloaded => {
-			const downloadedMonth= parseInt(downloaded.id.split('.')[1]);
-			const downloadedYear= parseInt(downloaded.id.split('.')[0]);
-			if (downloadedMonth < currentMonth && downloadedYear <= currentYear) {
-				if (downloaded.data().paid == false) unpaidMonths.push(downloaded.id);
-			}
-			collectionSize--;
-			if (collectionSize == 0) {
-				setUnpaidMonths(unpaidMonths);
-			}
-		}));
-
+		if (unpaids) {
+			const q = query(collection(db, uid+"Months"));
+			const querySnapshot = await getDocs(q);
+			let collectionSize=querySnapshot.size;
+			const currentDate = new Date();
+			const currentMonth = currentDate.getMonth() + 1;
+			const currentYear = currentDate.getFullYear();
+			querySnapshot.forEach((async downloaded => {
+				const downloadedMonth= parseInt(downloaded.id.split('.')[1]);
+				const downloadedYear= parseInt(downloaded.id.split('.')[0]);
+				if (downloadedMonth < currentMonth && downloadedYear <= currentYear) {
+					if (downloaded.data().paid == false) unpaidMonths.push(downloaded.id);
+				}
+				collectionSize--;
+				if (collectionSize == 0) {
+					setUnpaidMonths(unpaidMonths);
+				}
+			}));
+		} else {
+			setUnpaidMonths([]);
+		}
 	} catch (err) {
 		setPaid(false);
 	}
@@ -553,6 +560,34 @@ export const getChartData = async (setChartData: any, setNames: any, setFinished
 		setChartData([]);
 		setNames([]);
 		setFinished(true);
+	}
+}
+
+export const getSettings = async (setSettings: any) => {
+	try {
+		const uid = getUid();
+		const docRef = doc(db, uid+'Settings', 'settings');
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists()) {
+			setSettings(docSnap.data());
+        } else {
+			setSettings({unpaids: true});
+		}
+	} catch (err) {
+		console.error(err);
+		setSettings({unpaids: true});
+	}
+}
+
+export const saveSettings = async (settings: Settings) => {
+	try {
+		const uid = getUid();
+		const docRef = doc(db, uid+'Settings', 'settings');
+		await setDoc(docRef, settings);
+		successMessage(t("saveSuccess"));
+	} catch (err) {
+		console.error(err);
+		errorMessage(t("saveFail"));
 	}
 }
 

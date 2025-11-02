@@ -3,7 +3,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase';
 import { onAuthStateChanged } from "firebase/auth";
-import { User, Bill, getBills, saveBills, getYears, getMonthData, setPaidBool, setMonthNote, uploadFile } from '@/utils';
+import { User, Bill, Settings, getBills, saveBills, getYears, getMonthData, setPaidBool, setMonthNote, uploadFile, getSettings } from '@/utils';
 import { getTranslation } from '@/translations';
 import NavButtons from '@/components/NavButtons';
 import DateControls from '@/components/DateControls';
@@ -29,6 +29,7 @@ export default function Home() {
   const [paid, setPaid] = useState(true);
   const [note, setNote] = useState(String);
   const [unpaidList, setUnpaidList] = useState<String[] | []>([]);
+  const [settings, setSettings] = useState<Settings>({ unpaids: true });
   const dateChanged = (selected: number) => {
     if (selected > 12) {
       setSelectedDate(new Date(selected, selectedMonth-1, 1));
@@ -51,7 +52,7 @@ export default function Home() {
       setFilterNeeded(true);
     }
     let shortDate=(givenDate.getFullYear().toString()+'.'+(givenDate.getMonth()+1).toString());
-    const promises = [getMonthData(shortDate,setPaid, setNote, setUnpaidList), getBills(shortDate, setBills, setFinished)];
+    const promises = [getMonthData(shortDate,setPaid, setNote, settings.unpaids, setUnpaidList), getBills(shortDate, setBills, setFinished)];
     await Promise.all(promises);
   }
   const uploadBills = () => {
@@ -106,7 +107,7 @@ export default function Home() {
 		onAuthStateChanged(auth, async (user) => {
             if (user) {
                 setUser({ email: user.email, uid: user.uid });
-                fetchYears().then(() => fetchNewDate(selectedDate));
+                fetchYears().then(() => getSettings(setSettings).then(() => fetchNewDate(selectedDate)));
 			} else {
 				return router.push("/login");
 			}
@@ -140,7 +141,7 @@ if (!finished) return  <div className="flex justify-center border-b border-neutr
         toggleEditMode={() => setEditMode(!editMode)}
       />
 
-      <UnpaidBanner t={t} unpaidList={unpaidList} />
+      <UnpaidBanner t={t} unpaidList={unpaidList} unpaids={settings.unpaids} />
 
       <BillsTable
         t={t}

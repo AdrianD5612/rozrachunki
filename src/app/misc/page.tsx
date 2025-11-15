@@ -95,7 +95,7 @@ export default function Home() {
                     value={bill.name}
                     onChange={(e) => {
                       const newValue = e.target.value;
-                      setBills((prevBills: any) =>
+                      setBills((prevBills: MiscBill[]) =>
                         prevBills.map((prevBill: MiscBill) =>
                           prevBill.id === bill.id ? { ...prevBill, name: newValue } : prevBill
                         )
@@ -116,7 +116,7 @@ export default function Home() {
                     value={bill.amount}
                     onChange={(e) => {
                       const newValue = parseFloat(e.target.value);
-                      setBills((prevBills: any) =>
+                      setBills((prevBills: MiscBill[]) =>
                         prevBills.map((prevBill: MiscBill) =>
                           prevBill.id === bill.id ? { ...prevBill, amount: newValue } : prevBill
                         )
@@ -137,7 +137,7 @@ export default function Home() {
                     checked={bill.active}
                     onChange={(e) => {
                       const newValue = e.target.checked;
-                      setBills((prevBills: any) =>
+                      setBills((prevBills: MiscBill[]) =>
                         prevBills.map((prevBill: MiscBill) =>
                           prevBill.id === bill.id ? { ...prevBill, active: newValue } : prevBill
                         )

@@ -9,7 +9,7 @@ interface Props {
   filterNeeded: boolean;
   selectedDate: Date;
   inputClass: string;
-  setBills: React.Dispatch<any>;
+  setBills: React.Dispatch<React.SetStateAction<Bill[]>>;
   prepareUploadFile: (file: File | undefined, id: string) => void;
 }
 
@@ -52,7 +52,7 @@ export default function BillRow({
               value={bill.day ? (bill.day) : (bill.fixedDay ? (bill.fixedDayV) : '')}
               onChange={(e) => {
                 const newValue = parseInt(e.target.value);
-                setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, day: newValue } : prevBill));
+                setBills((prevBills: Bill[]) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, day: newValue } : prevBill));
               }}
             />
           ) : (
@@ -67,7 +67,7 @@ export default function BillRow({
               value={bill.amount ? (bill.amount) : (bill.fixedAmount ? (bill.fixedAmountV) : '')}
               onChange={(e) => {
                 const newValue = parseFloat(e.target.value);
-                setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, amount: newValue } : prevBill));
+                setBills((prevBills: Bill[]) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, amount: newValue } : prevBill));
               }}
             />
           ) : (
@@ -81,7 +81,7 @@ export default function BillRow({
                 className="text-3xl text-red-500 cursor-pointer"
                 onClick={() => {
                   deleteFile((selectedDate.getFullYear().toString() + '.' + (selectedDate.getMonth() + 1).toString()), bill.id);
-                  setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, file: false } : prevBill));
+                  setBills((prevBills: Bill[]) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, file: false } : prevBill));
                 }}
               />
             ) : (
@@ -91,7 +91,7 @@ export default function BillRow({
                 className="block w-full mb-5 text-xs border rounded-lg cursor-pointer text-gray-400 focus:outline-none bg-gray-700 border-gray-600 placeholder-gray-400"
                 onChange={(e) => {
                   prepareUploadFile(e.target.files?.[0], bill.id);
-                  setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, file: true } : prevBill));
+                  setBills((prevBills: Bill[]) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, file: true } : prevBill));
                 }}
               />
             )
@@ -116,7 +116,7 @@ export default function BillRow({
               checked={bill.noteEnabled}
               onChange={(e) => {
                 const newValue = e.target.checked;
-                setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, noteEnabled: newValue } : prevBill));
+                setBills((prevBills: Bill[]) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, noteEnabled: newValue } : prevBill));
               }}
             />
           </td>
@@ -131,7 +131,7 @@ export default function BillRow({
               value={bill.noteContent}
               onChange={(e) => {
                 const newValue = e.target.value;
-                setBills((prevBills: any) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, noteContent: newValue } : prevBill));
+                setBills((prevBills: Bill[]) => prevBills.map((prevBill: Bill) => prevBill.id === bill.id ? { ...prevBill, noteContent: newValue } : prevBill));
               }}
             />
           ) : (

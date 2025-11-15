@@ -29,7 +29,7 @@ export default function MonthNoteEditor({
           id="noteInput"
           name="noteInput"
           className={inputClass + " w-auto"}
-          value={note as any}
+          value={note}
           onChange={(e) => {
             setNote(e.target.value);
           }}

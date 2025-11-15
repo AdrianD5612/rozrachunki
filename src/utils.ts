@@ -47,6 +47,13 @@ export interface Settings {
 	unpaids: boolean;
 }
 
+export interface NavigationRouter {
+	push: (href: string) => void;
+}
+
+type ChartSeriesPoint = { label: string; y: number };
+type ChartData = ChartSeriesPoint[][];
+
 function getUid() {
 	return auth.currentUser? auth.currentUser.uid : 'error';
 }
@@ -55,13 +62,13 @@ function getUid() {
  * Retrieves bills data from the database and updates the state accordingly.
  *
  * @param {string} date - the date for which to retrieve bills data
- * @param {any} setBills - the function to update the bills state
- * @param {any} setFinished - the function to update the finished state
+ * @param {(bills: Bill[]) => void} setBills - the function to update the bills state
+ * @param {(finished: boolean) => void} setFinished - the function to update the finished state
  */
-export const getBills = async (date:  string, setBills: any, setFinished: any) => {
+export const getBills = async (date:  string, setBills: (bills: Bill[]) => void, setFinished: (finished: boolean) => void) => {
 	try {
 		const uid = getUid();
-		const bills: any = []
+		const bills: Bill[] = []
 		const q = query(collection(db, uid+"Bills"));
 		const querySnapshot = await getDocs(q);
 		let collectionSize=querySnapshot.size;	//amount of different bills
@@ -70,20 +77,20 @@ export const getBills = async (date:  string, setBills: any, setFinished: any) =
 				const docRef = doc(db, uid+"Bills", downloaded.id, 'amounts', date);
 				const docSnap = await getDoc(docRef);
 				if (docSnap.exists()) {
-					bills.push( { ...downloaded.data(), id: downloaded.id, ...docSnap.data() });
+					bills.push({ ...downloaded.data(), id: downloaded.id, ...docSnap.data() } as Bill);
 				} else {	//amount not yet exists
-				bills.push( { ...downloaded.data(), id: downloaded.id} );
+					bills.push({ ...downloaded.data(), id: downloaded.id } as Bill);
 				}
 			}
 			collectionSize--;
 			if (collectionSize === 0 ) {	//all bills have been fetched
 				//fix null order fields
-				bills.forEach((bill:any, index: number) => {
+				bills.forEach((bill: Bill, index: number) => {
 					if (!bill.hasOwnProperty('order') || bill.order === null || Number.isNaN(bill.order)) {
 						bills[index].order = index;
 					}
 				});
-				bills.sort((a:any, b:any) => a.order - b.order);
+				bills.sort((a: Bill, b: Bill) => a.order - b.order);
 				setFinished(true);	//it is finished after fetching all "amounts" docs for every collection entry, without this table will be rendered incomplete
 			}
 		}));
@@ -123,26 +130,26 @@ export const saveBills = async (date: string, newBills: Bill[]) => {
 /**
  * Asynchronous function to retrieve bills to manage and update the state accordingly.
  *
- * @param {any} setBills - function to set the bills state
- * @param {any} setFinished - function to set the finished state
+ * @param {(bills: BillLite[]) => void} setBills - function to set the bills state
+ * @param {(finished: boolean) => void} setFinished - function to set the finished state
  */
-export const getBillsToManage = async (setBills: any, setFinished: any) => {
+export const getBillsToManage = async (setBills: (bills: BillLite[]) => void, setFinished: (finished: boolean) => void) => {
 	try {
 		const uid = getUid();
-        const unsub = onSnapshot(collection(db, uid+"Bills"), doc => {
-            const docs: any = []
-            doc.forEach((d: any) => {
+			const unsub = onSnapshot(collection(db, uid+"Bills"), doc => {
+				const docs: BillLite[] = [];
+				doc.forEach((d) => {
 			  if (!d.data().deleted) {
-				docs.push( { ...d.data(), id: d.id });
+				docs.push({ ...d.data(), id: d.id } as BillLite);
 			  }
-            });
-			//fix null order fields
-			docs.forEach((bill:any, index: number) => {
-				if (!bill.hasOwnProperty('order') || bill.order === null || Number.isNaN(bill.order)) {
-					docs[index].order = index;
-				}
-			});
-			docs.sort((a:any, b:any) => a.order - b.order);
+				});
+				//fix null order fields
+				docs.forEach((bill: BillLite, index: number) => {
+					if (!bill.hasOwnProperty('order') || bill.order === null || Number.isNaN(bill.order)) {
+						docs[index].order = index;
+					}
+				});
+				docs.sort((a: BillLite, b: BillLite) => a.order - b.order);
 			setBills(docs);
 			setFinished(true);
         }) 
@@ -155,15 +162,14 @@ export const getBillsToManage = async (setBills: any, setFinished: any) => {
 /**
  * Save managed bills to the database.
  *
- * @param {any} newBills - array of new bills to be saved
+ * @param {BillLite[]} newBills - array of new bills to be saved
  */
-export const saveManagedBills = async (newBills: any) => {
+export const saveManagedBills = async (newBills: BillLite[]) => {
 	try {
 		const uid = getUid();
-		newBills.forEach(async (element:any) => {
-			let reducedElement={...element};
-			delete reducedElement.id;	//dont want redundant id field in db
-			await setDoc(doc(db, uid+"Bills", element.id), reducedElement);
+		newBills.forEach(async (element: BillLite) => {
+			const { id, ...reducedElement } = element; // dont want redundant id field in db
+			await setDoc(doc(db, uid+"Bills", id), reducedElement);
 		})
 		successMessage(t("saveSuccess"));
 	} catch(err) {
@@ -215,7 +221,7 @@ export const addBill = async (nextOrder: number) => {
 	}
 }
 
-export const getYears = async (setYears: any) => {
+export const getYears = async (setYears: (years: number[]) => void) => {
 	const currentYear = new Date().getFullYear();
 	const years : number[] = [];
 	//adding next year too
@@ -230,10 +236,17 @@ export const getYears = async (setYears: any) => {
  * Asynchronously retrieves data for a specific month and sets the 'paid' and 'note' state variables accordingly.
  *
  * @param {string} date - the date of the month to retrieve data for
- * @param {any} setPaid - function to set the 'paid' state variable
- * @param {any} setNote - function to set the 'note' state variable
+ * @param {(paid: boolean) => void} setPaid - function to set the 'paid' state variable
+ * @param {(note: string) => void} setNote - function to set the 'note' state variable
+ * @param {(months: string[]) => void} setUnpaidMonths - function to set the unpaid months list
  */
-export const getMonthData = async (date: string, setPaid: any, setNote: any, unpaids: boolean, setUnpaidMonths: any) => {
+export const getMonthData = async (
+	date: string,
+	setPaid: (paid: boolean) => void,
+	setNote: (note: string) => void,
+	unpaids: boolean,
+	setUnpaidMonths: (months: string[]) => void
+) => {
 	try {
 		const uid = getUid();
 		const docRef = doc(db, uid+'Months', date);
@@ -331,7 +344,7 @@ export const uploadFile = (file: File, date: string, id: string) => {
 	const uid = getUid();
 	const storage = getStorage();
 	const storageRef = ref(storage, uid+'/'+date+'/'+id+'.pdf');
-	let toastId : any = null;
+	let toastId: string | number | null = null;
 	const uploadTask = uploadBytesResumable(storageRef, file);
 	uploadTask.on('state_changed',
 		(snapshot) => {
@@ -360,7 +373,9 @@ export const uploadFile = (file: File, date: string, id: string) => {
 		}, 
 		async () => {
 			// success
-			toast.done(toastId);
+			if (toastId !== null) {
+				toast.done(toastId);
+			}
 			const billRef = doc(db, uid+"Bills", id, 'amounts', date);
 			const docSnap = await getDoc(billRef);
 			if (docSnap.exists()) {
@@ -439,33 +454,32 @@ export const deleteFile = (date: string, id: string) => {
 /**
  * Asynchronous function to fetch miscellaneous bills from the database and update the state with the retrieved data.
  *
- * @param {any} setBills - A function to set the state with the retrieved bills
- * @param {any} setFinished - A function to set the flag indicating that the data retrieval is finished
+ * @param {(bills: MiscBill[]) => void} setBills - A function to set the state with the retrieved bills
+ * @param {(finished: boolean) => void} setFinished - A function to set the flag indicating that the data retrieval is finished
  */
-export const getMiscBills = async (setBills: any, setFinished: any) => {
+export const getMiscBills = async (setBills: (bills: MiscBill[]) => void, setFinished: (finished: boolean) => void) => {
 	try {
 		const uid = getUid();
-        const unsub = onSnapshot(collection(db, uid+"Misc"), doc => {
-            const docs: any = []
-            doc.forEach((d: any) => {
-              docs.push( { ...d.data(), id: d.id })
-            });
-			//fix null order fields
-			docs.forEach((bill:any, index: number) => {
-				if (!bill.hasOwnProperty('order') || bill.order === null || Number.isNaN(bill.order)) {
-					docs[index].order = index;
-				}
-			});
-			docs.sort((a:any, b:any) => a.order - b.order);
-			setBills(docs);
-			setFinished(true);
+			const unsub = onSnapshot(collection(db, uid+"Misc"), doc => {
+				const docs: MiscBill[] = [];
+				doc.forEach((d) => {
+			      docs.push({ ...d.data(), id: d.id } as MiscBill);
+			    });
+				//fix null order fields
+				docs.forEach((bill: MiscBill, index: number) => {
+					if (!bill.hasOwnProperty('order') || bill.order === null || Number.isNaN(bill.order)) {
+						docs[index].order = index;
+					}
+				});
+				docs.sort((a: MiscBill, b: MiscBill) => a.order - b.order);
+				setBills(docs);
+				setFinished(true);
         }) 
 	} catch (err) {
 		console.error(err)
 		setBills([])
 	}
 }
-
 
 /**
  * Function to add a miscellaneous bill to the database.
@@ -507,15 +521,14 @@ export const deleteMiscBill = async (id: string) => {
 /**
  * Save miscellaneous bills to the database
  *
- * @param {any} newBills - array of new bills to be saved
+ * @param {MiscBill[]} newBills - array of new bills to be saved
  */
-export const saveMiscBills = async (newBills: any) => {
+export const saveMiscBills = async (newBills: MiscBill[]) => {
 	try {
 		const uid = getUid();
-		newBills.forEach(async (element:any) => {
-			let reducedElement={...element};
-			delete reducedElement.id;	//dont want redundant id field in db
-			await setDoc(doc(db, uid+"Misc", element.id), reducedElement);
+		newBills.forEach(async (element: MiscBill) => {
+			const { id, ...reducedElement } = element; // dont want redundant id field in db
+			await setDoc(doc(db, uid + "Misc", id), reducedElement);
 		})
 		successMessage(t("saveSuccess"));
 	} catch(err) {
@@ -524,11 +537,15 @@ export const saveMiscBills = async (newBills: any) => {
 	}
 }
 
-export const getChartData = async (setChartData: any, setNames: any, setFinished: any) => {
+export const getChartData = async (
+	setChartData: (data: ChartData) => void,
+	setNames: (names: string[]) => void,
+	setFinished: (finished: boolean) => void
+) => {
 	try {
 		const uid = getUid();
-		const data: any = [];
-		const names: String[] = [];
+		const data: ChartData = [];
+		const names: string[] = [];
 		const q = query(collection(db, uid+"Bills"));
 		const querySnapshot = await getDocs(q);
 		let collectionSize=querySnapshot.size;	//amount of all bills
@@ -563,13 +580,13 @@ export const getChartData = async (setChartData: any, setNames: any, setFinished
 	}
 }
 
-export const getSettings = async (setSettings: any) => {
+export const getSettings = async (setSettings: (settings: Settings) => void) => {
 	try {
 		const uid = getUid();
 		const docRef = doc(db, uid+'Settings', 'settings');
 		const docSnap = await getDoc(docRef);
 		if (docSnap.exists()) {
-			setSettings(docSnap.data());
+			setSettings(docSnap.data() as Settings);
         } else {
 			setSettings({unpaids: true});
 		}
@@ -631,9 +648,9 @@ export const errorMessage = (message:string) => {
  *
  * @param {string} email - the user's email
  * @param {string} password - the user's password
- * @param {any} router - the router object for navigation
+ * @param {NavigationRouter} router - the router object for navigation
  */
-export const LoginUser = (email: string, password: string, router: any) => {
+export const LoginUser = (email: string, password: string, router: NavigationRouter) => {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             const user = userCredential.user;
@@ -649,9 +666,9 @@ export const LoginUser = (email: string, password: string, router: any) => {
 /**
  * Logs the user out and navigates to the login page.
  *
- * @param {any} router - the router object for navigation
+ * @param {NavigationRouter} router - the router object for navigation
  */
-export const LogOut = (router: any) => {
+export const LogOut = (router: NavigationRouter) => {
 	signOut(auth)
 		.then(() => {
 			successMessage(t("logoutSuccess"));

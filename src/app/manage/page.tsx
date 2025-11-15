@@ -96,7 +96,7 @@ export default function Home() {
                     value={bill.name}
                     onChange={(e) => {
                       const newValue = e.target.value;
-                      setBills((prevBills: any) =>
+                      setBills((prevBills: BillLite[]) =>
                         prevBills.map((prevBill: BillLite) =>
                           prevBill.id === bill.id ? { ...prevBill, name: newValue } : prevBill
                         )
@@ -112,7 +112,7 @@ export default function Home() {
                     checked={bill.bimonthly}
                     onChange={(e) => {
                       const newValue = e.target.checked;
-                      setBills((prevBills: any) =>
+                      setBills((prevBills: BillLite[]) =>
                         prevBills.map((prevBill: BillLite) =>
                           prevBill.id === bill.id ? { ...prevBill, bimonthly: newValue } : prevBill
                         )
@@ -127,7 +127,7 @@ export default function Home() {
                     checked={bill.bimonthlyOdd}
                     onChange={(e) => {
                       const newValue = e.target.checked;
-                      setBills((prevBills: any) =>
+                      setBills((prevBills: BillLite[]) =>
                         prevBills.map((prevBill: BillLite) =>
                           prevBill.id === bill.id ? { ...prevBill, bimonthlyOdd: newValue } : prevBill
                         )
@@ -143,7 +143,7 @@ export default function Home() {
                     checked={bill.fixedDay}
                     onChange={(e) => {
                       const newValue = e.target.checked;
-                      setBills((prevBills: any) =>
+                      setBills((prevBills: BillLite[]) =>
                         prevBills.map((prevBill: BillLite) =>
                           prevBill.id === bill.id ? { ...prevBill, fixedDay: newValue } : prevBill
                         )
@@ -156,7 +156,7 @@ export default function Home() {
                     value={bill.fixedDayV}
                     onChange={(e) => {
                       const newValue = parseInt(e.target.value);
-                      setBills((prevBills: any) =>
+                      setBills((prevBills: BillLite[]) =>
                         prevBills.map((prevBill: BillLite) =>
                           prevBill.id === bill.id ? { ...prevBill, fixedDayV: newValue } : prevBill
                         )
@@ -171,7 +171,7 @@ export default function Home() {
                   checked={bill.fixedAmount}
                   onChange={(e) => {
                     const newValue = e.target.checked;
-                    setBills((prevBills: any) =>
+                    setBills((prevBills: BillLite[]) =>
                       prevBills.map((prevBill: BillLite) =>
                         prevBill.id === bill.id ? { ...prevBill, fixedAmount: newValue } : prevBill
                       )
@@ -184,7 +184,7 @@ export default function Home() {
                   value={bill.fixedAmountV}
                   onChange={(e) => {
                     const newValue = parseFloat(e.target.value);
-                    setBills((prevBills: any) =>
+                    setBills((prevBills: BillLite[]) =>
                       prevBills.map((prevBill: BillLite) =>
                         prevBill.id === bill.id ? { ...prevBill, fixedAmountV: newValue } : prevBill
                       )

@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { doc, deleteDoc, onSnapshot, collection, addDoc, query, where, serverTimestamp, orderBy, Timestamp, setDoc, getDocs, getDoc, updateDoc  } from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable, deleteObject, getDownloadURL } from "firebase/storage";
 import db from "./firebase";
-import axios from 'axios';
 import { getTranslation } from "./translations";
 
 const firstYear = 2024;
@@ -404,14 +403,12 @@ export const downloadFile = (date:string, id:string, name:string) => {
 	const storage = getStorage();
 	try {
 		const uid = getUid();
-        getDownloadURL(ref(storage, uid+'/'+date+'/'+id+'.pdf'))
+		getDownloadURL(ref(storage, uid+'/'+date+'/'+id+'.pdf'))
 		.then((url) => {
-			axios({
-				url: url,
-				method: 'GET',
-				responseType: 'blob',
-			}).then((response) => {
-				const href = URL.createObjectURL(response.data);
+			fetch(url, { mode: 'cors' })
+			.then((response) => response.blob())
+			.then((blob) => {
+				const href = URL.createObjectURL(blob);
 				// create "a" HTML element with href to file & click
 				const link = document.createElement('a');
 				link.href = href;
